@@ -1,0 +1,21 @@
+# kubectl apply -f admins.yaml --validate=false
+
+kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1alpha1
+metadata:
+  name: admin-role
+rules:
+  - apiGroups: ["*"]
+    resources: ["*"]
+    verbs: ["*"]
+---
+kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1alpha1
+metadata:
+  name: admin-binding
+subjects:
+  - kind: User
+    name: user@example.com
+roleRef:
+  kind: ClusterRole
+  name: admin-role

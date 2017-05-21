@@ -1,0 +1,23 @@
+# $ kubectl apply -f config_dns.yaml
+# $ kubectl -n kube-system get po
+# $ kubectl -n kube-system delete po kube-dns-3913472980-4stsm
+# $ kubectl -n kube-system get po
+# $ kubectl -n kube-system logs kube-dns-3913472980-m839b dnsmasq
+
+# $ kubectl exec busybox -- wget -O /dev/stdout nginx.service.consul:80
+
+# https://kubernetes.io/docs/tasks/configure-pod-container/configmap/
+# http://blog.kubernetes.io/2017/04/configuring-private-dns-zones-upstream-nameservers-kubernetes.html
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: kube-dns
+  namespace: kube-system
+  labels:
+    addonmanager.kubernetes.io/mode: EnsureExists
+data:
+  stubDomains: |
+    {"service.consul": ["10.0.8.11","10.0.8.13","10.0.8.15"]}
+  upstreamNameservers: |
+    ["10.0.8.11","10.0.8.13","10.0.8.15"]

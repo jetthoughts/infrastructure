@@ -1,4 +1,6 @@
-## How to build basic
+## How to build basic cluster
+
+
 
 ```shell
 $ export TF_VAR_version=`date +v%Y%m%d`
@@ -9,3 +11,9 @@ $ openssl pkcs12 -export -clcerts -inkey assets/kubecfg.key -in assets/kubecfg.c
 ```
 
 Next steps go to the [k8s-tasks](../../k8s-tasks/README.md)
+
+# Refernces:
+
+- [Installing Kubernetes on Linux with kubeadm](https://kubernetes.io/docs/getting-started-guides/kubeadm/)
+- [Setup K8S v1.6.0-rc.1 cluster](https://jtway.co/setup-k8s-v1-6-0-rc-1-cluster-b4cc7749973f)
+- [Kubernetes 1.6.1 Authentication via Google](https://jtway.co/kubernetes-auth-google-with-rbac-60a74787e6a5)
