@@ -4,6 +4,7 @@
 
 ## Distributed FS
 - https://rook.io/
+- https://www.minio.io/
 
 ## DB
 - https://www.cockroachlabs.com/
