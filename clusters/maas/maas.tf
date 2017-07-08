@@ -39,7 +39,7 @@ resource "null_resource" "maas-packages" {
   provisioner "remote-exec" {
     inline = [
       "sudo apt-add-repository -yu ppa:maas/next",
-      "DEBIAN_FRONTEND=noninteractive sudo apt install -yqq --no-install-recommends maas bzr isc-dhcp-server wakeonlan amtterm wsmancli zram-config maas-region-controller ntp",
+      "DEBIAN_FRONTEND=noninteractive sudo apt install -yqq --no-install-recommends maas bzr isc-dhcp-server wakeonlan amtterm wsmancli zram-config maas-region-controller",
       "sudo reboot"
     ]
   }
@@ -57,6 +57,10 @@ resource "null_resource" "maas-eth-network" {
   provisioner "remote-exec" {
     inline = [
       "echo \"allow-hotplug eth0\niface eth0 inet static\n  address ${var.private_ip}\n  netmask ${var.private_netmask}\" | sudo tee /etc/network/interfaces.d/01-eth0.cfg",
+      "sudo rm /etc/network/interfaces.d/rm 50-cloud-init.cfg",
+      "sudo ifdown eth0",
+      "sudo ifup eth0",
+      "sudo dpkg-reconfigure maas-region-controller",
       "sudo reboot"
     ]
   }
