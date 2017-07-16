@@ -28,7 +28,7 @@ resource "null_resource" "download-ca-certificate" {
     command = <<CMD
       scp -oStrictHostKeyChecking=no -oUserKnownHostsFile=/dev/null -o ProxyCommand="ssh -q -W %h:%p ${var.bastion["user"]}@${var.bastion["host"]} -p ${var.bastion["port"]} -i ${var.bastion["private_key"]}" ${data.aws_instance.master.private_ip}:${var.kube_conf_remote_path} ${var.asset_path}/${var.name}.conf
       ruby ${path.module}/data/extract_crt.rb -s ${var.asset_path}/${var.name}.conf -d ${var.asset_path}/${var.name}
-      kubectl config set-cluster ${var.name}.${var.datacenter} --server="https://${data.aws_instance.master.private_ip}:6443" --certificate-authority=${var.asset_path}/ca.crt
+      kubectl config set-cluster ${var.name}.${var.datacenter} --server="https://${data.aws_instance.master.private_ip}:6443" --certificate-authority=${var.asset_path}/${var.name}/ca.crt
 CMD
   }
 
@@ -37,6 +37,4 @@ CMD
       "rm ${var.kube_conf_remote_path}"
     ]
   }
-
-
 }
