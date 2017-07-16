@@ -19,7 +19,6 @@ resource "null_resource" "download-ca-certificate" {
   provisioner "remote-exec" {
     # Bootstrap script called with private_ip of each node in the clutser
     inline = [
-      "ls -la /home/centos",
       "while [ ! -f ${var.kube_conf_remote_path} ] ; do tail -n 40 /var/log/cloud-init-output.log; sleep 30; date; done",
     ]
   }

@@ -23,7 +23,7 @@ data "template_cloudinit_config" "master-init" {
   part {
     filename     = "02k8s_admins.sh"
     content_type = "text/x-shellscript"
-    content      = "#!/usr/bin/env bash\n\nkubectl --kubeconfig=/etc/kubernetes/admin.conf create clusterrolebinding cluster-admin-mn --clusterrole=cluster-admin --user=mn@pubnative.net\n"
+    content      = "#!/usr/bin/env bash\n\nkubectl --kubeconfig=/etc/kubernetes/admin.conf create clusterrolebinding cluster-admin-mn --clusterrole=cluster-admin --user=${var.admin_email}\n"
   }
 
   part {
