@@ -57,3 +57,8 @@ variable "bastion" {
 variable "admin_email" {
   description = "Admin email"
 }
+
+variable "spot_price" {
+  description = "If empty used Demand instances"
+  default = ""
+}

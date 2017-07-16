@@ -29,3 +29,8 @@ variable "security_group" {}
 variable "k8s_token" {
   description = "Kubeadm token. Generate a new token: `kubeadm token`"
 }
+
+variable "spot_price" {
+  description = "If empty used Demand instances"
+  default = "0.1"
+}

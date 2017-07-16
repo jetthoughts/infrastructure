@@ -38,11 +38,10 @@ resource "aws_launch_configuration" "master" {
   image_id          = "${var.image_id}"
   user_data         = "${data.template_cloudinit_config.master-init.rendered}"
   instance_type     = "c4.large"
-  spot_price        = "0.1"
   key_name          = "${var.ssh_key_name}"
   enable_monitoring = false
-
-  security_groups = ["${var.security_group}"]
+  spot_price        = "${var.spot_price}"
+  security_groups   = ["${var.security_group}"]
 
   root_block_device = {
     volume_type           = "standard"

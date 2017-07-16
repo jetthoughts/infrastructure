@@ -24,7 +24,7 @@ resource "aws_launch_configuration" "node" {
   image_id          = "${var.image_id}"
   user_data         = "${data.template_cloudinit_config.node-init.rendered}"
   instance_type     = "c4.large"
-  spot_price        = "0.1"
+  spot_price        = "${var.spot_price}"
   key_name          = "${var.ssh_key_name}"
   enable_monitoring = false
 
