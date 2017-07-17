@@ -19,8 +19,4 @@ sleep 10
 kubectl --kubeconfig=/etc/kubernetes/admin.conf apply -f https://raw.githubusercontent.com/projectcalico/canal/master/k8s-install/1.6/rbac.yaml
 kubectl --kubeconfig=/etc/kubernetes/admin.conf apply -f https://raw.githubusercontent.com/projectcalico/canal/master/k8s-install/1.6/canal.yaml
 
-# Allow centos user to access the cluster
-cp /etc/kubernetes/admin.conf /home/centos/admin.conf
-chown centos:centos /home/centos/admin.conf
-
 sync

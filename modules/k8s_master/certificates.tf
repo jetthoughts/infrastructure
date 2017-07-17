@@ -19,7 +19,16 @@ resource "null_resource" "download-ca-certificate" {
   provisioner "remote-exec" {
     # Bootstrap script called with private_ip of each node in the clutser
     inline = [
-      "while [ ! -f ${var.kube_conf_remote_path} ] ; do tail -n 40 /var/log/cloud-init-output.log; sleep 30; date; done",
+      "ls /etc/kubernetes/admin.conf",
+      "while [ ! -f /etc/kubernetes/admin.conf ] ; do tail -n 40 /var/log/cloud-init-output.log; sleep 30; date; done",
+    ]
+  }
+
+  provisioner "remote-exec" {
+    # Bootstrap script called with private_ip of each node in the clutser
+    inline = [
+      "sudo cp /etc/kubernetes/admin.conf ${var.kube_conf_remote_path}",
+      "sudo chown centos:centos ${var.kube_conf_remote_path}"
     ]
   }
 

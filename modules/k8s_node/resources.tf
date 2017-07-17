@@ -34,6 +34,7 @@ resource "aws_launch_configuration" "node" {
     volume_type           = "standard"
     volume_size           = 20
     delete_on_termination = true
+    iops                  = 0
   }
 
   lifecycle {

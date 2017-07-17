@@ -15,6 +15,9 @@ variable "k8s_version" {
   default = "v1.7.1"
 }
 
+variable "k8s_pod_network_cidr" {
+  default = "10.244.0.0/16"
+}
 variable "datacenter" {
   description = "Datacenter name"
   default     = "virginia"

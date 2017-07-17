@@ -4,7 +4,7 @@ data "template_file" "master_user_data" {
   vars {
     k8s_token              = "${var.k8s_token}"
     k8s_version            = "${var.k8s_version}"
-    k8s_pod_network_cidr   = "10.244.0.0/16"
+    k8s_pod_network_cidr   = "${var.k8s_pod_network_cidr}"
     domain                 = "api.${var.name}.${var.datacenter}.${var.dns_primary_domain}"
     google_oauth_client_id = "${var.google_oauth_client_id}"
   }
