@@ -83,7 +83,7 @@ resource "aws_autoscaling_group" "master" {
   tag {
     propagate_at_launch = true
     key                 = "Name"
-    value               = "k8s-master-${var.name}-spotinst"
+    value               = "k8s-master-${var.name}"
   }
 
   tag {

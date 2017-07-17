@@ -66,7 +66,7 @@ resource "aws_autoscaling_group" "node" {
   tag {
     propagate_at_launch = true
     key                 = "Name"
-    value               = "k8s-node-${var.name}-spotinst"
+    value               = "k8s-node-${var.name}"
   }
 
   tag {
