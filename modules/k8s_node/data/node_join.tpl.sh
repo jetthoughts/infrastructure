@@ -9,6 +9,7 @@ export PRIVATE_HOSTNAME=$(curl http://instance-data/latest/meta-data/hostname)
 
 sysctl kernel.hostname=$PRIVATE_HOSTNAME
 
-kubeadm join --token="${k8s_token}" ${master_ip}:6443
+# Until merge we need skip preflight checks: https://github.com/kubernetes/kubernetes/pull/49073/files
+kubeadm join --token="${k8s_token}" ${master_ip}:6443 --skip-preflight-checks
 
 sync
