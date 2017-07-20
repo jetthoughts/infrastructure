@@ -48,10 +48,6 @@ resource "aws_launch_configuration" "master" {
     volume_size           = 20
     delete_on_termination = true
   }
-
-  lifecycle {
-    create_before_destroy = true
-  }
 }
 
 resource "aws_autoscaling_group" "master" {
@@ -66,9 +62,8 @@ resource "aws_autoscaling_group" "master" {
     "${var.subnet_id}",
   ]
 
-  min_size         = "0"
+  min_size         = "1"
   max_size         = "1"
-  desired_capacity = "1"
 
   termination_policies = [
     "OldestInstance",

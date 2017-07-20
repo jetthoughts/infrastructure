@@ -20,7 +20,7 @@ data "template_cloudinit_config" "node-init" {
 }
 
 resource "aws_launch_configuration" "node" {
-  name_prefix       = "k8s-node-${var.version}-"
+  name_prefix       = "k8s-node-${var.name}-${var.version}-"
   image_id          = "${var.image_id}"
   user_data         = "${data.template_cloudinit_config.node-init.rendered}"
   instance_type     = "c4.large"
@@ -52,10 +52,13 @@ resource "aws_autoscaling_group" "node" {
   vpc_zone_identifier = [
     "${var.subnet_id}",
   ]
-  min_size             = "0"
+  min_size             = "1"
   max_size             = "3"
-  desired_capacity     = "1"
   launch_configuration = "${aws_launch_configuration.node.name}"
+
+  lifecycle {
+    create_before_destroy = true
+  }
 
   tag {
     propagate_at_launch = true
