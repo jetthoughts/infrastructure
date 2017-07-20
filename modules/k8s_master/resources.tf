@@ -34,7 +34,7 @@ data "template_cloudinit_config" "master-init" {
 }
 
 resource "aws_launch_configuration" "master" {
-  name_prefix       = "k8s-master-${var.name}-${var.version}-"
+  name_prefix       = "k8s-${var.name}-${var.version}-master-"
   image_id          = "${var.image_id}"
   user_data         = "${data.template_cloudinit_config.master-init.rendered}"
   instance_type     = "c4.large"
@@ -51,7 +51,7 @@ resource "aws_launch_configuration" "master" {
 }
 
 resource "aws_autoscaling_group" "master" {
-  name                 = "k8s-master-${var.name}-${var.version}"
+  name                 = "k8s-${var.name}-${var.version}-master"
   launch_configuration = "${aws_launch_configuration.master.name}"
 
   availability_zones = [
@@ -69,6 +69,10 @@ resource "aws_autoscaling_group" "master" {
     "OldestInstance",
   ]
 
+  lifecycle {
+    prevent_destroy = true
+  }
+
   tag {
     propagate_at_launch = true
     key                 = "Cluster"
@@ -78,7 +82,7 @@ resource "aws_autoscaling_group" "master" {
   tag {
     propagate_at_launch = true
     key                 = "Name"
-    value               = "k8s-master-${var.name}"
+    value               = "k8s-${var.name}-master"
   }
 
   tag {

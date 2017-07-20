@@ -20,7 +20,7 @@ data "template_cloudinit_config" "node-init" {
 }
 
 resource "aws_launch_configuration" "node" {
-  name_prefix       = "k8s-node-${var.name}-${var.version}-"
+  name_prefix       = "k8s-${var.name}-${var.version}-node-"
   image_id          = "${var.image_id}"
   user_data         = "${data.template_cloudinit_config.node-init.rendered}"
   instance_type     = "c4.large"
@@ -44,7 +44,7 @@ resource "aws_launch_configuration" "node" {
 
 # Run instances
 resource "aws_autoscaling_group" "node" {
-  name                 = "k8s-node-${var.name}-${var.version}"
+  name                 = "k8s-${var.name}-${var.version}-node"
   availability_zones = [
     "${var.availability_zone}",
   ]
@@ -57,7 +57,7 @@ resource "aws_autoscaling_group" "node" {
   launch_configuration = "${aws_launch_configuration.node.name}"
 
   lifecycle {
-    create_before_destroy = true
+    // prevent_destroy = true
   }
 
   tag {
@@ -69,7 +69,7 @@ resource "aws_autoscaling_group" "node" {
   tag {
     propagate_at_launch = true
     key                 = "Name"
-    value               = "k8s-node-${var.name}"
+    value               = "k8s-${var.name}-node"
   }
 
   tag {
