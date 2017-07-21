@@ -56,10 +56,6 @@ resource "aws_autoscaling_group" "node" {
   max_size             = "3"
   launch_configuration = "${aws_launch_configuration.node.name}"
 
-  lifecycle {
-    // prevent_destroy = true
-  }
-
   tag {
     propagate_at_launch = true
     key                 = "Cluster"

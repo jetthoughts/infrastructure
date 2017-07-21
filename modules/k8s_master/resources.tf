@@ -69,10 +69,6 @@ resource "aws_autoscaling_group" "master" {
     "OldestInstance",
   ]
 
-  lifecycle {
-    prevent_destroy = true
-  }
-
   tag {
     propagate_at_launch = true
     key                 = "Cluster"
