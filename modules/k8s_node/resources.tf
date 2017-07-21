@@ -44,7 +44,8 @@ resource "aws_launch_configuration" "node" {
 
 # Run instances
 resource "aws_autoscaling_group" "node" {
-  name                 = "k8s-${var.name}-${var.version}-node"
+  name = "k8s-${var.name}-${var.version}-node"
+
   availability_zones = [
     "${var.availability_zone}",
   ]
@@ -52,6 +53,7 @@ resource "aws_autoscaling_group" "node" {
   vpc_zone_identifier = [
     "${var.subnet_id}",
   ]
+
   min_size             = "1"
   max_size             = "3"
   launch_configuration = "${aws_launch_configuration.node.name}"

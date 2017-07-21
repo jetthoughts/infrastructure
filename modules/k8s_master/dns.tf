@@ -1,5 +1,6 @@
 data "aws_instance" "master" {
   depends_on = ["aws_autoscaling_group.master"]
+
   instance_tags {
     "aws:autoscaling:groupName" = "${aws_autoscaling_group.master.name}"
     Name                        = "k8s-${var.name}-master"

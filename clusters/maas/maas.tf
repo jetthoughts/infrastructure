@@ -14,7 +14,7 @@ resource "null_resource" "zram" {
     inline = [
       "cat /tmp/zram | sudo tee /etc/rc.local",
       "sudo bash /tmp/zram",
-      "sudo reboot"
+      "sudo reboot",
     ]
   }
 }
@@ -22,7 +22,6 @@ resource "null_resource" "zram" {
 # https://github.com/madeden/blogposts/blob/master/k8s-gpu-cluster/10-install-maas.md
 # Maas Devel: https://docs.ubuntu.com/maas/devel/en/release-notes
 resource "null_resource" "maas-packages" {
-
   depends_on = ["null_resource.wifi", "null_resource.zram"]
 
   connection {
@@ -40,7 +39,7 @@ resource "null_resource" "maas-packages" {
     inline = [
       "sudo apt-add-repository -yu ppa:maas/next",
       "DEBIAN_FRONTEND=noninteractive sudo apt install -yqq --no-install-recommends maas bzr isc-dhcp-server wakeonlan amtterm wsmancli zram-config maas-region-controller",
-      "sudo reboot"
+      "sudo reboot",
     ]
   }
 }
@@ -61,7 +60,7 @@ resource "null_resource" "maas-eth-network" {
       "sudo ifdown eth0",
       "sudo ifup eth0",
       "sudo dpkg-reconfigure maas-region-controller",
-      "sudo reboot"
+      "sudo reboot",
     ]
   }
 }
@@ -77,8 +76,7 @@ resource "null_resource" "maas-admin" {
 
   provisioner "remote-exec" {
     inline = [
-      "sudo maas createadmin --username=${var.maas_admin["username"]} --email=${var.maas_admin["email"]} --password=${var.maas_admin["password"]}"
+      "sudo maas createadmin --username=${var.maas_admin["username"]} --email=${var.maas_admin["email"]} --password=${var.maas_admin["password"]}",
     ]
   }
 }
-

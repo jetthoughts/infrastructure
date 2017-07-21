@@ -1,16 +1,18 @@
 resource "aws_autoscaling_group" "k8s-master-v20170521" {
   name                 = "k8s-master-${var.version}"
   launch_configuration = "${aws_launch_configuration.k8s-master-v20170521.name}"
-  availability_zones   = [
-    "${var.availability_zone}"
-  ]
-  vpc_zone_identifier  = [
-    "${var.subnet_id}"
+
+  availability_zones = [
+    "${var.availability_zone}",
   ]
 
-  min_size             = "0"
-  max_size             = "1"
-  desired_capacity     = "1"
+  vpc_zone_identifier = [
+    "${var.subnet_id}",
+  ]
+
+  min_size         = "0"
+  max_size         = "1"
+  desired_capacity = "1"
 
   termination_policies = [
     "OldestInstance",
@@ -56,7 +58,7 @@ resource "aws_launch_configuration" "k8s-master-v20170521" {
   key_name          = "${aws_key_pair.zero-pn-k8s-key.key_name}"
   enable_monitoring = false
 
-  security_groups   = [
+  security_groups = [
     "${aws_security_group.k8s_nodes.id}",
   ]
 
@@ -112,7 +114,7 @@ data "aws_instance" "master" {
   }
 
   filter {
-    name   = "instance-state-name"
+    name = "instance-state-name"
 
     values = [
       "running",

@@ -23,7 +23,7 @@ resource "null_resource" "upgrade-packages" {
       "sudo apt-mark unhold linux-raspi2 linux-image-raspi2 linux-headers-raspi2",
       "sudo apt-get update && sudo apt-get upgrade -y && sudo apt-get dist-upgrade -y",
       "sudo sed 's/device_tree_address.*/device_tree_address=0x02008000/g; s/^.*device_tree_end.*//g;' -i /boot/firmware/config.txt",
-      "sudo reboot"
+      "sudo reboot",
     ]
   }
 }
@@ -40,7 +40,7 @@ resource "null_resource" "set-hostname" {
     inline = [
       "sudo hostnamectl set-hostname ${var.server_hostname}",
       "echo '127.0.0.1 ${var.server_hostname}' | sudo tee -a /etc/hosts",
-      "sudo reboot"
+      "sudo reboot",
     ]
   }
 }
@@ -62,10 +62,9 @@ resource "null_resource" "wifi" {
       "cd /lib/firmware/brcm/",
       "sudo wget https://github.com/RPi-Distro/firmware-nonfree/raw/master/brcm80211/brcm/brcmfmac43430-sdio.bin",
       "sudo wget https://github.com/RPi-Distro/firmware-nonfree/raw/master/brcm80211/brcm/brcmfmac43430-sdio.txt",
-
       "echo \"allow-hotplug wlan0\niface wlan0 inet dhcp\nwpa-conf /etc/wpa_supplicant/wpa_supplicant.conf\" | sudo tee /etc/network/interfaces.d/10-wlan.cfg",
       "echo \"network={\\nssid=\\\"${var.wlan_ssid}\\\"\\npsk=\\\"${var.wlan_psk}\\\"\\n}\" | sudo tee /etc/wpa_supplicant/wpa_supplicant.conf",
-      "sudo reboot"
+      "sudo reboot",
     ]
   }
 }

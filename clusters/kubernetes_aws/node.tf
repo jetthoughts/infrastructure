@@ -1,10 +1,12 @@
 resource "aws_autoscaling_group" "k8s-node-v20170521" {
-  name                 = "k8s-node-${var.version}"
-  availability_zones   = [
-    "${var.availability_zone}"
+  name = "k8s-node-${var.version}"
+
+  availability_zones = [
+    "${var.availability_zone}",
   ]
-  vpc_zone_identifier  = [
-    "${var.subnet_id}"
+
+  vpc_zone_identifier = [
+    "${var.subnet_id}",
   ]
 
   min_size             = "0"
@@ -56,7 +58,7 @@ resource "aws_launch_configuration" "k8s-node-v20170521" {
   key_name          = "${var.key}"
   enable_monitoring = false
 
-  security_groups   = [
+  security_groups = [
     "${aws_security_group.k8s_nodes.id}",
   ]
 
@@ -96,4 +98,3 @@ data "template_file" "node_join" {
     master_ip = "${data.aws_instance.master.private_ip}"
   }
 }
-

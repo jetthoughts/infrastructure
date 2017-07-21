@@ -28,7 +28,7 @@ resource "null_resource" "download-ca-certificate" {
     # Bootstrap script called with private_ip of each node in the clutser
     inline = [
       "sudo cp /etc/kubernetes/admin.conf ${var.kube_conf_remote_path}",
-      "sudo chown centos:centos ${var.kube_conf_remote_path}"
+      "sudo chown centos:centos ${var.kube_conf_remote_path}",
     ]
   }
 
@@ -42,7 +42,7 @@ CMD
 
   provisioner "remote-exec" {
     inline = [
-      "rm ${var.kube_conf_remote_path}"
+      "rm ${var.kube_conf_remote_path}",
     ]
   }
 
@@ -52,5 +52,4 @@ CMD
       kubectl config set-context ${var.admin_email}@${var.name}.${var.datacenter} --cluster="${var.name}.${var.datacenter}" --user="${var.admin_email}" --namespace=default
 CMD
   }
-
 }

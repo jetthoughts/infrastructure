@@ -12,7 +12,7 @@ variable "availability_zone" {
 
 variable "subnet_id" {
   description = "For VPC we need to know in which subnet setup a cluster. E.g: subnet-321312312"
-  type = "string"
+  type        = "string"
 }
 
 variable "key" {
@@ -23,7 +23,7 @@ variable "key" {
 
 variable "bastion" {
   description = "It is a good practice to use VPN or Bastion instance to connect the private network"
-  type    = "map"
+  type        = "map"
 
   default = {
     host        = "bastion.example.com"
@@ -56,7 +56,7 @@ variable "version" {
 
 variable "kube_conf_remote_path" {
   description = "To download kubernetes config we need setup some folder that could be access by default user. Depends on Linux distributive, it could be ec2-user, centos or ubuntu"
-  default = "/home/centos/admin.conf"
+  default     = "/home/centos/admin.conf"
 }
 
 variable "google_oauth_client_id" {}

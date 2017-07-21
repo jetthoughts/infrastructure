@@ -1,6 +1,7 @@
 variable "name" {
   default = "staging"
 }
+
 variable "asset_path" {
   description = "The path to the kubernetes asset path"
   type        = "string"
@@ -18,6 +19,7 @@ variable "k8s_version" {
 variable "k8s_pod_network_cidr" {
   default = "10.244.0.0/16"
 }
+
 variable "datacenter" {
   description = "Datacenter name"
   default     = "virginia"
@@ -41,27 +43,32 @@ variable "image_id" {}
 variable "ssh_key_name" {}
 variable "security_group" {}
 variable "google_oauth_client_id" {}
+
 variable "dns_zone_id" {
   description = "Route53 ZoneID"
 }
+
 variable "dns_primary_domain" {
   default = "example.com"
 }
+
 variable "bastion" {
   description = "Access to the cluster via SSH bastion instance"
   type        = "map"
-  default     = {
+
+  default = {
     host        = ""
     port        = ""
     user        = ""
     private_key = ""
   }
 }
+
 variable "admin_email" {
   description = "Admin email"
 }
 
 variable "spot_price" {
   description = "If empty used Demand instances"
-  default = ""
+  default     = ""
 }

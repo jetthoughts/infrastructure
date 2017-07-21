@@ -62,8 +62,8 @@ resource "aws_autoscaling_group" "master" {
     "${var.subnet_id}",
   ]
 
-  min_size         = "1"
-  max_size         = "1"
+  min_size = "1"
+  max_size = "1"
 
   termination_policies = [
     "OldestInstance",

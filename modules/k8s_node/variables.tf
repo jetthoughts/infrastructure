@@ -32,5 +32,5 @@ variable "k8s_token" {
 
 variable "spot_price" {
   description = "If empty used Demand instances"
-  default = "0.1"
+  default     = "0.1"
 }

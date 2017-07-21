@@ -74,6 +74,7 @@ resource "aws_security_group" "k8s_nodes" {
       "0.0.0.0/0",
     ]
   }
+
   tags {
     Name      = "k8s-node"
     Cluster   = "k8s"
