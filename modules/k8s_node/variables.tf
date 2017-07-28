@@ -22,6 +22,10 @@ variable "master_ip" {
 
 variable "image_id" {}
 
+variable "instance_type" {
+  default = "r4.large"
+}
+
 variable "ssh_key_name" {}
 
 variable "security_group" {}

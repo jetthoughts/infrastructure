@@ -37,7 +37,7 @@ resource "aws_launch_configuration" "master" {
   name_prefix       = "k8s-${var.name}-${var.version}-master-"
   image_id          = "${var.image_id}"
   user_data         = "${data.template_cloudinit_config.master-init.rendered}"
-  instance_type     = "c4.large"
+  instance_type     = "${var.instance_type}"
   key_name          = "${var.ssh_key_name}"
   enable_monitoring = false
   spot_price        = "${var.spot_price}"
@@ -48,10 +48,14 @@ resource "aws_launch_configuration" "master" {
     volume_size           = 20
     delete_on_termination = true
   }
+
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
 resource "aws_autoscaling_group" "master" {
-  name                 = "k8s-${var.name}-${var.version}-master"
+  name                 = "k8s-${var.name}-master"
   launch_configuration = "${aws_launch_configuration.master.name}"
 
   availability_zones = [
@@ -72,7 +76,7 @@ resource "aws_autoscaling_group" "master" {
   tag {
     propagate_at_launch = true
     key                 = "Cluster"
-    value               = "k8s"
+    value               = "k8s-${var.name}"
   }
 
   tag {

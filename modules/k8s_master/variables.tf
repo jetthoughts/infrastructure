@@ -25,6 +25,10 @@ variable "datacenter" {
   default     = "virginia"
 }
 
+variable "instance_type" {
+  default = "r4.large"
+}
+
 variable "availability_zone" {
   default = "us-east-1a"
 }
