@@ -93,10 +93,4 @@ resource "aws_autoscaling_group" "node" {
     key                 = "K8SVersion"
     value               = "${var.k8s_version}"
   }
-
-  tag {
-    propagate_at_launch = true
-    key                 = "K8SMaster"
-    value               = "${var.master_ip}"
-  }
 }
