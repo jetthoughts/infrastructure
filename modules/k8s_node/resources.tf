@@ -54,8 +54,8 @@ resource "aws_autoscaling_group" "node" {
     "${var.subnet_id}",
   ]
 
-  min_size             = "1"
-  max_size             = "3"
+  min_size             = "${var.min_size}"
+  max_size             = "${var.max_size}"
   launch_configuration = "${aws_launch_configuration.node.name}"
 
   tag {
