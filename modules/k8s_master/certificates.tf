@@ -48,7 +48,7 @@ CMD
 
   provisioner "local-exec" {
     command = <<CMD
-      kubectl config set-cluster ${var.name}.${var.datacenter} --server="https://${data.aws_instance.master.private_ip}:6443" --certificate-authority=${var.asset_path}/${var.name}/ca.crt
+      kubectl config set-cluster ${var.name}.${var.datacenter} --server="https://${data.aws_instance.master.private_ip}:6443" --certificate-authority=${var.asset_path}/${var.name}/ca.crt --embed-certs=true
       kubectl config set-context ${var.admin_email}@${var.name}.${var.datacenter} --cluster="${var.name}.${var.datacenter}" --user="${var.admin_email}" --namespace=default
 CMD
   }
