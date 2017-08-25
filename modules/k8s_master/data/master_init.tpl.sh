@@ -8,10 +8,16 @@ export PRIVATE_HOSTNAME=$(curl http://instance-data/latest/meta-data/hostname)
 
 sysctl kernel.hostname=$PRIVATE_HOSTNAME
 
+for i in `seq 5 1`
+do
+  sleep $[ $i * 10 ]
+  docker ps && break || true
+done
+
 # Pre pull images for canal
-docker pull quay.io/calico/node:v1.3.0
-docker pull quay.io/calico/cni:v1.9.1
-docker pull quay.io/coreos/flannel:v0.8.0
+docker pull quay.io/calico/node:v2.4.1 || true
+docker pull quay.io/calico/cni:v1.10.0 || true
+docker pull quay.io/coreos/flannel:v0.8.0 || true
 
 kubeadm init --token="${k8s_token}" \
              --apiserver-advertise-address=$PRIVATE_IP \
@@ -25,7 +31,7 @@ kubeadm init --token="${k8s_token}" \
 sed -i "/- kube-apiserver/a\    - --oidc-issuer-url=https://accounts.google.com\n    - --oidc-username-claim=email\n    - --oidc-client-id=${google_oauth_client_id}" /etc/kubernetes/manifests/kube-apiserver.yaml
 
 # Enable CronJob resources
-sed -i "/- kube-apiserver/a\    - --runtime-config=batch/v2alpha1=true" /etc/kubernetes/manifests/kube-apiserver.yaml
+sed -i "/- kube-apiserver/a\    - --runtime-config=api/all=true" /etc/kubernetes/manifests/kube-apiserver.yaml
 
 sleep 10
 
