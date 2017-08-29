@@ -61,13 +61,13 @@ resource "aws_autoscaling_group" "node" {
   tag {
     propagate_at_launch = true
     key                 = "Cluster"
-    value               = "k8s-${var.name}"
+    value               = "k8s-${var.cluster}"
   }
 
   tag {
     propagate_at_launch = true
     key                 = "Name"
-    value               = "k8s-${var.name}-node"
+    value               = "k8s-${var.cluster}-node"
   }
 
   tag {

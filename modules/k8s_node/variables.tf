@@ -2,6 +2,10 @@ variable "name" {
   default = "staging"
 }
 
+variable "cluster" {
+  default = "staging"
+}
+
 variable "version" {
   default = "v20170715"
 }
