@@ -36,7 +36,7 @@ variable "availability_zone" {
 variable "subnet_id" {}
 
 variable "version" {
-  default = "v20170822"
+  default = "v20170901"
 }
 
 variable "kube_conf_remote_path" {

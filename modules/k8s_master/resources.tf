@@ -34,11 +34,13 @@ data "template_cloudinit_config" "master-init" {
 }
 
 resource "aws_launch_configuration" "master" {
+  depends_on = ["aws_iam_role_policy.masters"]
   name_prefix       = "k8s-${var.name}-${var.version}-master-"
   image_id          = "${var.image_id}"
   user_data         = "${data.template_cloudinit_config.master-init.rendered}"
   instance_type     = "${var.instance_type}"
   key_name          = "${var.ssh_key_name}"
+  iam_instance_profile = "${aws_iam_instance_profile.masters.id}"
   enable_monitoring = false
   spot_price        = "${var.spot_price}"
   security_groups   = ["${var.security_group}"]
@@ -107,5 +109,11 @@ resource "aws_autoscaling_group" "master" {
     propagate_at_launch = true
     key                 = "K8SVersion"
     value               = "${var.k8s_version}"
+  }
+
+  tag {
+    propagate_at_launch =  true
+    key = "KubernetesCluster"
+    value = "${var.name}"
   }
 }

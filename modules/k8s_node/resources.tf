@@ -20,12 +20,15 @@ data "template_cloudinit_config" "node-init" {
 }
 
 resource "aws_launch_configuration" "node" {
+  depends_on = ["aws_iam_role_policy.nodes"]
   name_prefix       = "k8s-${var.name}-${var.version}-node-"
   image_id          = "${var.image_id}"
   user_data         = "${data.template_cloudinit_config.node-init.rendered}"
   instance_type     = "${var.instance_type}"
   spot_price        = "${var.spot_price}"
   key_name          = "${var.ssh_key_name}"
+  iam_instance_profile = "${aws_iam_instance_profile.nodes.id}"
+
   enable_monitoring = false
 
   security_groups = ["${var.security_group}"]
@@ -93,4 +96,11 @@ resource "aws_autoscaling_group" "node" {
     key                 = "K8SVersion"
     value               = "${var.k8s_version}"
   }
+
+  tag {
+    propagate_at_launch = true
+    key = "KubernetesCluster"
+    value = "${var.cluster}"
+  }
+
 }

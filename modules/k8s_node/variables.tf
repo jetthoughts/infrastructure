@@ -7,7 +7,7 @@ variable "cluster" {
 }
 
 variable "version" {
-  default = "v20170715"
+  default = "v20170901"
 }
 
 variable "k8s_version" {
