@@ -45,10 +45,10 @@ variable "spot_price" {
 
 variable "min_size" {
   description = "Minimum number of instances"
-  default = "1"
+  default     = "1"
 }
 
 variable "max_size" {
   description = "Minimum number of instances"
-  default = "1"
+  default     = "1"
 }
