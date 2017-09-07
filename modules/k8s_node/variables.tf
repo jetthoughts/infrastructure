@@ -14,6 +14,11 @@ variable "k8s_version" {
   default = "v1.7.1"
 }
 
+variable "node_labels" {
+  type = "list"
+  default = []
+}
+
 variable "availability_zone" {
   default = "us-east-1a"
 }

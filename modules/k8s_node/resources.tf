@@ -5,6 +5,7 @@ data "template_file" "node_join" {
     k8s_token   = "${var.k8s_token}"
     k8s_version = "${var.k8s_version}"
     master_ip   = "${var.master_ip}"
+    labels      = "${join(" ", var.node_labels)}"
   }
 }
 
@@ -17,6 +18,13 @@ data "template_cloudinit_config" "node-init" {
     content_type = "text/x-shellscript"
     content      = "${data.template_file.node_join.rendered}"
   }
+
+  part {
+    filename     = "99reboot.sh"
+    content_type = "text/x-shellscript"
+    content      = "#!/usr/bin/env bash\n\ntouch /tmp/completed_user_data ; reboot\n"
+  }
+
 }
 
 resource "aws_launch_configuration" "node" {
