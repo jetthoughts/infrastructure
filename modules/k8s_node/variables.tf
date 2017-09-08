@@ -59,6 +59,7 @@ variable "max_size" {
 }
 
 variable "tags" {
+  type = "list"
   description = "Autoscaling tags"
 
   default = [
