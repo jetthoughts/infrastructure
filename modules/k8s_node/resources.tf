@@ -24,7 +24,6 @@ data "template_cloudinit_config" "node-init" {
     content_type = "text/x-shellscript"
     content      = "#!/usr/bin/env bash\n\ntouch /tmp/completed_user_data ; reboot\n"
   }
-
 }
 
 resource "aws_launch_configuration" "node" {
@@ -69,45 +68,43 @@ resource "aws_autoscaling_group" "node" {
   max_size             = "${var.max_size}"
   launch_configuration = "${aws_launch_configuration.node.name}"
 
-  tag {
-    propagate_at_launch = true
-    key                 = "Cluster"
-    value               = "k8s-${var.cluster}"
-  }
+  tags = [
+    {
+      propagate_at_launch = true
+      key                 = "Cluster"
+      value               = "k8s-${var.cluster}"
+    },
+    {
+      propagate_at_launch = true
+      key                 = "Name"
+      value               = "k8s-${var.cluster}-node"
+    },
+    {
+      propagate_at_launch = true
+      key                 = "Role"
+      value               = "k8s-node"
+    },
+    {
+      propagate_at_launch = true
+      key                 = "Terraform"
+      value               = "true"
+    },
+    {
+      propagate_at_launch = true
+      key                 = "Version"
+      value               = "${var.version}"
+    },
+    {
+      propagate_at_launch = true
+      key                 = "K8SVersion"
+      value               = "${var.k8s_version}"
+    },
+    {
+      propagate_at_launch = true
+      key                 = "KubernetesCluster"
+      value               = "${var.cluster}"
+    },
+  ]
 
-  tag {
-    propagate_at_launch = true
-    key                 = "Name"
-    value               = "k8s-${var.cluster}-node"
-  }
-
-  tag {
-    propagate_at_launch = true
-    key                 = "Role"
-    value               = "k8s-node"
-  }
-
-  tag {
-    propagate_at_launch = true
-    key                 = "Terraform"
-    value               = "true"
-  }
-
-  tag {
-    propagate_at_launch = true
-    key                 = "Version"
-    value               = "${var.version}"
-  }
-
-  tag {
-    propagate_at_launch = true
-    key                 = "K8SVersion"
-    value               = "${var.k8s_version}"
-  }
-
-  tag {
-    propagate_at_launch = true
-    key                 = "KubernetesCluster"
-    value               = "${var.cluster}"
-  }
+  tags = ["${var.tags}"]
 }

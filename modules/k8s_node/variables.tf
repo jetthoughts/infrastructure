@@ -15,7 +15,7 @@ variable "k8s_version" {
 }
 
 variable "node_labels" {
-  type = "list"
+  type    = "list"
   default = []
 }
 
@@ -56,4 +56,16 @@ variable "min_size" {
 variable "max_size" {
   description = "Minimum number of instances"
   default     = "1"
+}
+
+variable "tags" {
+  description = "Autoscaling tags"
+
+  default = [
+    {
+      key                 = "Terraform"
+      value               = "true"
+      propagate_at_launch = true
+    },
+  ]
 }
