@@ -19,3 +19,17 @@ $ terraform apply -target=null_resource.maas-packages -var 'server_ip=10.0.0.1
 $ terraform apply -target=null_resource.maas-admin -var 'server_ip=10.0.0.1 
 $ terraform apply -target=null_resource.maas-eth-network -var 'server_ip=10.0.0.1 
 ```
+
+## Install Maas Node
+
+- Flash SD card https://ubuntu-pi-flavour-maker.org/download/
+- Boot and click 0 to enable U-Boot menu
+- Get the Ethernet mac addrs
+- Run commands:
+
+```
+device_tree_address=0x02008000
+dhcp
+pxe get
+pxe boot
+```

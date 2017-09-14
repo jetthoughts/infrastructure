@@ -68,3 +68,22 @@ resource "null_resource" "wifi" {
     ]
   }
 }
+
+# Monitoring netdata
+# https://my-netdata.io/
+resource "null_resource" "monitoring" {
+  depends_on = ["null_resource.wifi"]
+
+  connection {
+    type = "ssh"
+    user = "ubuntu"
+    host = "${var.server_ip}"
+  }
+
+  provisioner "remote-exec" {
+    inline = [
+      "curl -Ss https://my-netdata.io/kickstart.sh > netdata.sh",
+      "sudo bash netdata.sh --non-interactive",
+    ]
+  }
+}
