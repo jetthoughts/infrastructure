@@ -10,18 +10,30 @@ data "template_file" "master_user_data" {
   }
 }
 
-data "template_cloudinit_config" "master-init" {
+data "template_cloudinit_config" "master_init" {
   gzip          = false
   base64_encode = false
 
   part {
-    filename     = "01master.sh"
+    filename     = "01packages.sh"
+    content_type = "text/x-shellscript"
+    content      = "${file("${path.module}/data/packages.sh")}"
+  }
+
+  part {
+    filename     = "02ks8_args.sh"
+    content_type = "text/x-shellscript"
+    content      = "${file("${path.module}/data/k8s_kubelet_extra_args.sh")}"
+  }
+
+  part {
+    filename     = "10master.sh"
     content_type = "text/x-shellscript"
     content      = "${data.template_file.master_user_data.rendered}"
   }
 
   part {
-    filename     = "02k8s_admins.sh"
+    filename     = "20k8s_admins.sh"
     content_type = "text/x-shellscript"
     content      = "#!/usr/bin/env bash\n\nkubectl --kubeconfig=/etc/kubernetes/admin.conf create clusterrolebinding cluster-admin-mn --clusterrole=cluster-admin --user=${var.admin_email}\n"
   }
@@ -37,7 +49,7 @@ resource "aws_launch_configuration" "master" {
   depends_on           = ["aws_iam_role_policy.masters"]
   name_prefix          = "k8s-${var.name}-${var.version}-master-"
   image_id             = "${var.image_id}"
-  user_data            = "${data.template_cloudinit_config.master-init.rendered}"
+  user_data            = "${data.template_cloudinit_config.master_init.rendered}"
   instance_type        = "${var.instance_type}"
   key_name             = "${var.ssh_key_name}"
   iam_instance_profile = "${aws_iam_instance_profile.masters.id}"

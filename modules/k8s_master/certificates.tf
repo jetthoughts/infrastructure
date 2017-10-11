@@ -34,8 +34,9 @@ resource "null_resource" "download-ca-certificate" {
 
   provisioner "local-exec" {
     command = <<CMD
-      mkdir -p ${var.asset_path}/${var.name}  
-      scp -oStrictHostKeyChecking=no -oUserKnownHostsFile=/dev/null -o ProxyCommand="ssh -q -W %h:%p ${var.bastion["user"]}@${var.bastion["host"]} -p ${var.bastion["port"]} -i ${var.bastion["private_key"]}" ${data.aws_instance.master.private_ip}:${var.kube_conf_remote_path} ${var.asset_path}/${var.name}.conf
+      mkdir -p ${var.asset_path}/${var.name}
+      echo "${self.triggers.master_private_ip}"
+      scp -oStrictHostKeyChecking=no -oUserKnownHostsFile=/dev/null -o ProxyCommand="ssh -q -W %h:%p ${var.bastion["user"]}@${var.bastion["host"]} -p ${var.bastion["port"]} -i ${var.bastion["private_key"]}" -i "${var.asset_path}/${var.ssh_key_name}" centos@${data.aws_instance.master.private_ip}:${var.kube_conf_remote_path} ${var.asset_path}/${var.name}.conf
       ruby ${path.module}/data/extract_crt.rb -s ${var.asset_path}/${var.name}.conf -d ${var.asset_path}/${var.name}
 CMD
   }

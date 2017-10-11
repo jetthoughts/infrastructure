@@ -17,6 +17,7 @@ data "aws_instance" "master" {
 }
 
 resource "aws_route53_record" "api" {
+  count = "${var.dns_zone_id != "" ? 1 : 0}"
   zone_id = "${var.dns_zone_id}"
   name    = "api.${var.name}.${var.datacenter}"
   type    = "A"
