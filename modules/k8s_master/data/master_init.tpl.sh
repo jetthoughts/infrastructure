@@ -15,6 +15,7 @@ do
 done
 
 # Pre pull images for canal
+docker pull gcr.io/google_containers/pause-amd64 || true
 docker pull quay.io/calico/node:v2.4.1 || true
 docker pull quay.io/calico/cni:v1.10.0 || true
 docker pull quay.io/coreos/flannel:v0.8.0 || true
@@ -25,7 +26,8 @@ kubeadm init --token="${k8s_token}" \
              --pod-network-cidr="${k8s_pod_network_cidr}" \
              --kubernetes-version="${k8s_version}" \
              --skip-token-print \
-             --token-ttl 0
+             --token-ttl 0 \
+             --skip-preflight-checks # Until kubeadm 1.8.1 released
 
 # Enable OpenID Connect Authorization
 sed -i "/- kube-apiserver/a\    - --oidc-issuer-url=https://accounts.google.com\n    - --oidc-username-claim=email\n    - --oidc-client-id=${google_oauth_client_id}" /etc/kubernetes/manifests/kube-apiserver.yaml
@@ -35,7 +37,9 @@ sed -i "/- kube-apiserver/a\    - --runtime-config=api/all=true" /etc/kubernetes
 
 sleep 10
 
-kubectl --kubeconfig=/etc/kubernetes/admin.conf apply -f https://raw.githubusercontent.com/projectcalico/canal/master/k8s-install/1.6/rbac.yaml
-kubectl --kubeconfig=/etc/kubernetes/admin.conf apply -f https://raw.githubusercontent.com/projectcalico/canal/master/k8s-install/1.6/canal.yaml
+#kubectl --kubeconfig=/etc/kubernetes/admin.conf apply -f https://raw.githubusercontent.com/projectcalico/canal/master/k8s-install/1.7/rbac.yaml
+kubectl --kubeconfig=/etc/kubernetes/admin.conf apply -f https://raw.githubusercontent.com/rbankston/canal/15b94c829ab5c0201ca7ab831da7fe44c2708ac8/k8s-install/1.8/rbac.yaml
+#kubectl --kubeconfig=/etc/kubernetes/admin.conf apply -f https://raw.githubusercontent.com/projectcalico/canal/master/k8s-install/1.7/canal.yaml
+kubectl --kubeconfig=/etc/kubernetes/admin.conf apply -f https://raw.githubusercontent.com/rbankston/canal/15b94c829ab5c0201ca7ab831da7fe44c2708ac8/k8s-install/1.8/canal.yaml
 
 sync

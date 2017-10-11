@@ -50,6 +50,7 @@ variable "google_oauth_client_id" {}
 
 variable "dns_zone_id" {
   description = "Route53 ZoneID"
+  default = ""
 }
 
 variable "dns_primary_domain" {
