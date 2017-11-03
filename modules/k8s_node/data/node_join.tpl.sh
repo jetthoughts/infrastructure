@@ -9,7 +9,7 @@ export PRIVATE_HOSTNAME=$(curl http://instance-data/latest/meta-data/hostname)
 
 sysctl kernel.hostname=$PRIVATE_HOSTNAME
 
-kubeadm join --token="${k8s_token}" ${master_ip}:6443 --node-name="$PRIVATE_HOSTNAME"
+kubeadm join --token="${k8s_token}" ${master_ip}:6443 --node-name="$PRIVATE_HOSTNAME" --discovery-token-unsafe-skip-ca-verification
 
 export NODE_LABELS="${labels}"
 
@@ -17,5 +17,8 @@ if [ "$NODE_LABELS" != "" ]; then
   sleep 30
   kubectl --kubeconfig=/etc/kubernetes/kubelet.conf label node/$PRIVATE_HOSTNAME $NODE_LABELS
 fi
+
+# If master_ip is the host kubeadm resolve it and use ip. It revert such changes
+kubectl --kubeconfig=/etc/kubernetes/kubelet.conf config set-cluster default-cluster --server="https://${master_ip}:6443"
 
 sync

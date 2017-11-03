@@ -54,18 +54,10 @@ resource "aws_security_group" "k8s_nodes" {
   }
 
   // https://kubernetes.io/docs/admin/kubelet/
-  //  kubelet-ready-port
-  ingress {
-    from_port = 10255
-    to_port   = 10255
-    protocol  = "tcp"
-    self      = true
-  }
-
-  //  kubelet-serve-port
+  // https://kubernetes.io/docs/setup/independent/install-kubeadm/
   ingress {
     from_port = 10250
-    to_port   = 10250
+    to_port   = 10255
     protocol  = "tcp"
     self      = true
   }
@@ -101,9 +93,10 @@ resource "aws_security_group" "k8s_nodes" {
     self      = false
 
     cidr_blocks = [
-      "0.0.0.0/0"
+      "0.0.0.0/0",
     ]
   }
+
   tags {
     Name      = "k8s-node-${var.cluster}"
     Cluster   = "k8s"

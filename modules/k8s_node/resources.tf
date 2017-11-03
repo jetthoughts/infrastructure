@@ -20,6 +20,12 @@ data "template_cloudinit_config" "node-init" {
   }
 
   part {
+    filename     = "02ks8_args.sh"
+    content_type = "text/x-shellscript"
+    content      = "${file("${path.module}/data/k8s_kubelet_extra_args.sh")}"
+  }
+
+  part {
     filename     = "99reboot.sh"
     content_type = "text/x-shellscript"
     content      = "#!/usr/bin/env bash\n\ntouch /tmp/completed_user_data ; reboot\n"

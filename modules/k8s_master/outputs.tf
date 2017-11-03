@@ -3,5 +3,5 @@ output "domain" {
 }
 
 output "master_ip" {
-  value = "${data.aws_instance.master.private_ip}"
+  value = "${aws_instance.masters.*.private_ip}"
 }

@@ -7,11 +7,11 @@ variable "cluster" {
 }
 
 variable "version" {
-  default = "v20170901"
+  default = "v20171106"
 }
 
 variable "k8s_version" {
-  default = "v1.7.1"
+  default = "v1.8.3"
 }
 
 variable "node_labels" {
@@ -59,7 +59,7 @@ variable "max_size" {
 }
 
 variable "tags" {
-  type = "list"
+  type        = "list"
   description = "Autoscaling tags"
 
   default = [

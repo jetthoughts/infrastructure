@@ -1,3 +1,102 @@
+resource "aws_instance" "masters" {
+  count         = "${var.cluster_size}"
+  depends_on    = ["aws_iam_role_policy.masters"]
+  ami           = "${var.image_id}"
+  instance_type = "${var.instance_type}"
+
+  key_name               = "${var.ssh_key_name}"
+  iam_instance_profile   = "${aws_iam_instance_profile.masters.id}"
+  monitoring             = false
+  vpc_security_group_ids = ["${var.security_groups}"]
+  availability_zone      = "${var.availability_zone}"
+  subnet_id              = "${var.subnet_id}"
+  private_ip             = "${element(var.master_addresses, count.index)}"
+
+  root_block_device = {
+    volume_type           = "standard"
+    volume_size           = 20
+    delete_on_termination = true
+    iops                  = 0
+  }
+
+  tags = {
+    Name      = "k8s-${var.name}-master-${count.index}"
+    Role      = "k8s-master"
+    Cluster   = "k8s-${var.name}"
+    Terraform = "true"
+    Version   = "${var.version}"
+  }
+
+  ////  Provision
+  connection {
+    host                = "${self.private_ip}"
+    user                = "centos"
+    private_key         = "${file("${var.asset_path}/${var.ssh_key_name}")}"
+    bastion_host        = "${var.bastion["host"]}"
+    bastion_user        = "${var.bastion["user"]}"
+    bastion_port        = "${var.bastion["port"]}"
+    bastion_private_key = "${file(var.bastion["private_key"])}"
+  }
+
+  provisioner "remote-exec" {
+    inline = [
+      "mkdir -p /tmp/terraform/pki",
+    ]
+  }
+
+  provisioner "file" {
+    source      = "${path.module}/data/packages.sh"
+    destination = "/tmp/terraform/packages.sh"
+  }
+
+  provisioner "file" {
+    source      = "${path.module}/data/k8s_kubelet_extra_args.sh"
+    destination = "/tmp/terraform/k8s_kubelet_extra_args.sh"
+  }
+
+  provisioner "file" {
+    source      = "${path.module}/data/certificates.sh"
+    destination = "/tmp/terraform/certificates.sh"
+  }
+
+  provisioner "file" {
+    source      = "${var.certs_path}/"
+    destination = "/tmp/terraform/pki"
+  }
+
+  provisioner "file" {
+    content     = "${data.template_file.kubeadm_config.rendered}"
+    destination = "/tmp/terraform/kubeadm_config.sh"
+  }
+
+  provisioner "file" {
+    content     = "${data.template_file.master_user_data.rendered}"
+    destination = "/tmp/terraform/master.sh"
+  }
+
+  provisioner "file" {
+    content     = <<EOF
+set -x
+kubectl --kubeconfig=/etc/kubernetes/admin.conf create clusterrolebinding cluster-admin-${var.admin_email} --clusterrole=cluster-admin --user=${var.admin_email} || true
+kubectl --kubeconfig=/etc/kubernetes/admin.conf create clusterrolebinding admin-${var.admin_email} --clusterrole=admin --user=${var.admin_email} || true
+EOF
+    destination = "/tmp/terraform/admin.sh"
+  }
+
+  provisioner "remote-exec" {
+    inline = [
+      "chmod +x /tmp/terraform/*.sh",
+      "sudo /tmp/terraform/packages.sh",
+      "sudo /tmp/terraform/k8s_kubelet_extra_args.sh",
+      "sudo /tmp/terraform/certificates.sh",
+      "sudo /tmp/terraform/kubeadm_config.sh",
+      "sudo /tmp/terraform/master.sh",
+      "sudo sh /tmp/terraform/admin.sh",
+      "sudo reboot",
+    ]
+  }
+}
+
 data "template_file" "master_user_data" {
   template = "${file("${path.module}/data/master_init.tpl.sh")}"
 
@@ -7,125 +106,22 @@ data "template_file" "master_user_data" {
     k8s_pod_network_cidr   = "${var.k8s_pod_network_cidr}"
     domain                 = "api.${var.name}.${var.datacenter}.${var.dns_primary_domain}"
     google_oauth_client_id = "${var.google_oauth_client_id}"
+    ca_crt                 = "${var.k8s_ca_crt}"
+    master_ips             = "\"${join("\" \"", var.master_addresses)}\""
+    etcd_endpoints         = "\"${join("\" \"", var.etcd_endpoints)}\""
   }
 }
 
-data "template_cloudinit_config" "master_init" {
-  gzip          = false
-  base64_encode = false
+data "template_file" "kubeadm_config" {
+  template = "${file("${path.module}/data/kubeadm_config.tpl.sh")}"
 
-  part {
-    filename     = "01packages.sh"
-    content_type = "text/x-shellscript"
-    content      = "${file("${path.module}/data/packages.sh")}"
-  }
-
-  part {
-    filename     = "02ks8_args.sh"
-    content_type = "text/x-shellscript"
-    content      = "${file("${path.module}/data/k8s_kubelet_extra_args.sh")}"
-  }
-
-  part {
-    filename     = "10master.sh"
-    content_type = "text/x-shellscript"
-    content      = "${data.template_file.master_user_data.rendered}"
-  }
-
-  part {
-    filename     = "20k8s_admins.sh"
-    content_type = "text/x-shellscript"
-    content      = "#!/usr/bin/env bash\n\nkubectl --kubeconfig=/etc/kubernetes/admin.conf create clusterrolebinding cluster-admin-mn --clusterrole=cluster-admin --user=${var.admin_email}\n"
-  }
-
-  part {
-    filename     = "99reboot.sh"
-    content_type = "text/x-shellscript"
-    content      = "#!/usr/bin/env bash\n\ntouch /tmp/completed_user_data ; reboot\n"
-  }
-}
-
-resource "aws_launch_configuration" "master" {
-  depends_on           = ["aws_iam_role_policy.masters"]
-  name_prefix          = "k8s-${var.name}-${var.version}-master-"
-  image_id             = "${var.image_id}"
-  user_data            = "${data.template_cloudinit_config.master_init.rendered}"
-  instance_type        = "${var.instance_type}"
-  key_name             = "${var.ssh_key_name}"
-  iam_instance_profile = "${aws_iam_instance_profile.masters.id}"
-  enable_monitoring    = false
-  spot_price           = "${var.spot_price}"
-  security_groups      = ["${var.security_group}"]
-
-  root_block_device = {
-    volume_type           = "standard"
-    volume_size           = 20
-    delete_on_termination = true
-  }
-
-  lifecycle {
-    create_before_destroy = true
-  }
-}
-
-resource "aws_autoscaling_group" "master" {
-  name                 = "k8s-${var.name}-master"
-  launch_configuration = "${aws_launch_configuration.master.name}"
-
-  availability_zones = [
-    "${var.availability_zone}",
-  ]
-
-  vpc_zone_identifier = [
-    "${var.subnet_id}",
-  ]
-
-  min_size = "1"
-  max_size = "1"
-
-  termination_policies = [
-    "OldestInstance",
-  ]
-
-  tag {
-    propagate_at_launch = true
-    key                 = "Cluster"
-    value               = "k8s-${var.name}"
-  }
-
-  tag {
-    propagate_at_launch = true
-    key                 = "Name"
-    value               = "k8s-${var.name}-master"
-  }
-
-  tag {
-    propagate_at_launch = true
-    key                 = "Role"
-    value               = "k8s-master"
-  }
-
-  tag {
-    propagate_at_launch = true
-    key                 = "Terraform"
-    value               = "true"
-  }
-
-  tag {
-    propagate_at_launch = true
-    key                 = "Version"
-    value               = "${var.version}"
-  }
-
-  tag {
-    propagate_at_launch = true
-    key                 = "K8SVersion"
-    value               = "${var.k8s_version}"
-  }
-
-  tag {
-    propagate_at_launch = true
-    key                 = "KubernetesCluster"
-    value               = "${var.name}"
+  vars {
+    k8s_token              = "${var.k8s_token}"
+    k8s_version            = "${var.k8s_version}"
+    k8s_pod_network_cidr   = "${var.k8s_pod_network_cidr}"
+    domain                 = "api.${var.name}.${var.datacenter}.${var.dns_primary_domain}"
+    google_oauth_client_id = "${var.google_oauth_client_id}"
+    master_ips             = "\"${join("\" \"", concat(var.master_addresses, var.cert_sans))}\""
+    etcd_endpoints         = "\"${join("\" \"", var.etcd_endpoints)}\""
   }
 }

@@ -1,8 +1,0 @@
-#!/usr/bin/env bash
-
-# -x Print command traces before executing command.
-set -x
-# -e Exit immediately if a command exits with a non-zero status.
-set -e
-
-kubeadm join --token="${k8s_token}" ${master_ip}:6443

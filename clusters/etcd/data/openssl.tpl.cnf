@@ -1,0 +1,19 @@
+[ req ]
+distinguished_name = req_distinguished_name
+[req_distinguished_name]
+[ v3_ca ]
+basicConstraints = critical, CA:TRUE
+keyUsage = critical, digitalSignature, keyEncipherment, keyCertSign
+[ v3_req_etcd ]
+basicConstraints = CA:FALSE
+keyUsage = critical, digitalSignature, keyEncipherment
+extendedKeyUsage = serverAuth, clientAuth
+subjectAltName = @alt_names_etcd
+[ alt_names_etcd ]
+DNS.1 = kub01
+DNS.2 = kub02
+DNS.3 = kub03
+IP.1 = 10.0.0.21
+IP.2 = 10.0.0.22
+IP.3 = 10.0.0.26
+
