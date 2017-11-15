@@ -110,6 +110,11 @@ resource "aws_autoscaling_group" "node" {
       key                 = "KubernetesCluster"
       value               = "${var.cluster}"
     },
+    {
+      propagate_at_launch = true
+      key                 = "kubernetes.io/cluster/${var.cluster}"
+      value               = "${var.cluster}"
+    },
   ]
 
   tags = ["${var.tags}"]

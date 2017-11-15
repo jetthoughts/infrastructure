@@ -1,3 +1,8 @@
+locals {
+  ec2_tag_keys = ["Role", "Cluster", "KubernetesCluster", "kubernetes.io/cluster/${var.name}", "Terraform", "Version", "Name"]
+  ec2_tag_vals = ["k8s-master", "k8s-${var.name}", "${var.name}", "true", "true", "${var.version}", "k8s-${var.name}-master"]
+}
+
 resource "aws_instance" "masters" {
   count         = "${var.cluster_size}"
   depends_on    = ["aws_iam_role_policy.masters"]
@@ -19,13 +24,8 @@ resource "aws_instance" "masters" {
     iops                  = 0
   }
 
-  tags = {
-    Name      = "k8s-${var.name}-master-${count.index}"
-    Role      = "k8s-master"
-    Cluster   = "k8s-${var.name}"
-    Terraform = "true"
-    Version   = "${var.version}"
-  }
+  tags = "${zipmap(local.ec2_tag_keys, local.ec2_tag_vals)}"
+  volume_tags = "${zipmap(local.ec2_tag_keys, local.ec2_tag_vals)}"
 
   ////  Provision
   connection {
@@ -121,6 +121,7 @@ data "template_file" "kubeadm_config" {
     k8s_pod_network_cidr   = "${var.k8s_pod_network_cidr}"
     domain                 = "api.${var.name}.${var.datacenter}.${var.dns_primary_domain}"
     google_oauth_client_id = "${var.google_oauth_client_id}"
+    cluster_size           = "${var.cluster_size}"
     master_ips             = "\"${join("\" \"", concat(var.master_addresses, var.cert_sans))}\""
     etcd_endpoints         = "\"${join("\" \"", var.etcd_endpoints)}\""
   }

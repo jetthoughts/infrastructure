@@ -18,6 +18,7 @@ nodeName: $PRIVATE_HOSTNAME
 token: ${k8s_token}
 tokenTTL: 0h0m0s
 apiServerExtraArgs:
+  apiserver-count: "${cluster_size}"
   runtime-config: "api/all=true"
   oidc-issuer-url: "https://accounts.google.com"
   oidc-username-claim: email
