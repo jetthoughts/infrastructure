@@ -1,5 +1,5 @@
 resource "null_resource" "download-ca-certificate" {
-  count = "${length(aws_instance.masters.*.private_ip) > 0 ? 1 : 0}"
+  count      = "${length(concat(aws_instance.masters.*.private_ip, list(""))) > 0 ? 1 : 0}"
   depends_on = ["aws_instance.masters"]
 
   # Changes to any instance of the cluster requires re-provisioning

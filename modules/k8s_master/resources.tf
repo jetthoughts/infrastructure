@@ -9,13 +9,14 @@ resource "aws_instance" "masters" {
   ami           = "${var.image_id}"
   instance_type = "${var.instance_type}"
 
-  key_name               = "${var.ssh_key_name}"
-  iam_instance_profile   = "${aws_iam_instance_profile.masters.id}"
-  monitoring             = false
-  vpc_security_group_ids = ["${var.security_groups}"]
-  availability_zone      = "${var.availability_zone}"
-  subnet_id              = "${var.subnet_id}"
-  private_ip             = "${element(var.master_addresses, count.index)}"
+  key_name                = "${var.ssh_key_name}"
+  iam_instance_profile    = "${aws_iam_instance_profile.masters.id}"
+  monitoring              = false
+  vpc_security_group_ids  = ["${var.security_groups}"]
+  availability_zone       = "${var.availability_zone}"
+  subnet_id               = "${var.subnet_id}"
+  private_ip              = "${element(var.master_addresses, count.index)}"
+  disable_api_termination = true
 
   root_block_device = {
     volume_type           = "standard"
@@ -24,7 +25,7 @@ resource "aws_instance" "masters" {
     iops                  = 0
   }
 
-  tags = "${zipmap(local.ec2_tag_keys, local.ec2_tag_vals)}"
+  tags        = "${zipmap(local.ec2_tag_keys, local.ec2_tag_vals)}"
   volume_tags = "${zipmap(local.ec2_tag_keys, local.ec2_tag_vals)}"
 
   ////  Provision
@@ -75,11 +76,12 @@ resource "aws_instance" "masters" {
   }
 
   provisioner "file" {
-    content     = <<EOF
+    content = <<EOF
 set -x
 kubectl --kubeconfig=/etc/kubernetes/admin.conf create clusterrolebinding cluster-admin-${var.admin_email} --clusterrole=cluster-admin --user=${var.admin_email} || true
 kubectl --kubeconfig=/etc/kubernetes/admin.conf create clusterrolebinding admin-${var.admin_email} --clusterrole=admin --user=${var.admin_email} || true
 EOF
+
     destination = "/tmp/terraform/admin.sh"
   }
 
