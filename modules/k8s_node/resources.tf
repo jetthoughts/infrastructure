@@ -34,7 +34,7 @@ data "template_cloudinit_config" "node-init" {
 
 resource "aws_launch_configuration" "node" {
   depends_on           = ["aws_iam_role_policy.nodes"]
-  name_prefix          = "k8s-${var.name}-${var.version}-node-"
+  name_prefix          = "k8s-${var.name}-${var.k8s_version}-node-"
   image_id             = "${var.image_id}"
   user_data            = "${data.template_cloudinit_config.node-init.rendered}"
   instance_type        = "${var.instance_type}"
@@ -89,16 +89,6 @@ resource "aws_autoscaling_group" "node" {
       propagate_at_launch = true
       key                 = "Role"
       value               = "k8s-node"
-    },
-    {
-      propagate_at_launch = true
-      key                 = "Terraform"
-      value               = "true"
-    },
-    {
-      propagate_at_launch = true
-      key                 = "Version"
-      value               = "${var.version}"
     },
     {
       propagate_at_launch = true

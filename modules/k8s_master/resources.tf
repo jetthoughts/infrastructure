@@ -1,6 +1,5 @@
 locals {
-  ec2_tag_keys = ["Role", "Cluster", "KubernetesCluster", "kubernetes.io/cluster/${var.name}", "Terraform", "Version", "Name"]
-  ec2_tag_vals = ["k8s-master", "k8s-${var.name}", "${var.name}", "true", "true", "${var.version}", "k8s-${var.name}-master"]
+  ec2_tags = "${merge(map("Name", "k8s-${var.name}-master", "KubernetesCluster", "${var.name}", "kubernetes.io/cluster/${var.name}", "true"),var.tags)}"
 }
 
 resource "aws_instance" "masters" {
@@ -25,8 +24,8 @@ resource "aws_instance" "masters" {
     iops                  = 0
   }
 
-  tags        = "${zipmap(local.ec2_tag_keys, local.ec2_tag_vals)}"
-  volume_tags = "${zipmap(local.ec2_tag_keys, local.ec2_tag_vals)}"
+  tags        = "${local.ec2_tags}"
+  volume_tags = "${local.ec2_tags}"
 
   ////  Provision
   connection {
