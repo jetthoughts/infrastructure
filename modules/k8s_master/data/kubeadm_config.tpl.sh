@@ -19,7 +19,7 @@ token: ${k8s_token}
 tokenTTL: 0h0m0s
 apiServerExtraArgs:
   apiserver-count: "${cluster_size}"
-  runtime-config: "api/all=true,batch/v1beta1=true,batch/all=true"
+  runtime-config: "api/all=true,batch/v1beta1=true"
   oidc-issuer-url: "https://accounts.google.com"
   oidc-username-claim: email
   oidc-client-id: ${google_oauth_client_id}
