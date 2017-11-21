@@ -17,7 +17,7 @@ variable "k8s_token" {
 }
 
 variable "k8s_version" {
-  default = "v1.8.3"
+  default = "v1.8.4"
 }
 
 variable "k8s_pod_network_cidr" {
@@ -44,7 +44,7 @@ variable "availability_zone" {
 variable "subnet_id" {}
 
 variable "version" {
-  default = "v20171106"
+  default = "v20171122"
 }
 
 variable "kube_conf_remote_path" {

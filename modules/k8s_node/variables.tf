@@ -7,11 +7,11 @@ variable "cluster" {
 }
 
 variable "version" {
-  default = "v20171120"
+  default = "v20171122"
 }
 
 variable "k8s_version" {
-  default = "v1.8.3"
+  default = "v1.8.4"
 }
 
 variable "node_labels" {
