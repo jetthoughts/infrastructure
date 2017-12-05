@@ -7,7 +7,7 @@ variable "cluster" {
 }
 
 variable "version" {
-  default = "v20171122"
+  default = "v20171205"
 }
 
 variable "k8s_version" {
@@ -69,4 +69,9 @@ variable "tags" {
       propagate_at_launch = true
     },
   ]
+}
+
+variable "pre_init_script" {
+  description = "Content to be run before the kubeadm."
+  default = ""
 }

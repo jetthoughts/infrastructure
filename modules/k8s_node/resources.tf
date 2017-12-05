@@ -14,6 +14,12 @@ data "template_cloudinit_config" "node-init" {
   base64_encode = false
 
   part {
+    filename     = "00pre.sh"
+    content_type = "text/x-shellscript"
+    content      = "${var.pre_init_script}"
+  }
+
+  part {
     filename     = "01node.sh"
     content_type = "text/x-shellscript"
     content      = "${data.template_file.node_join.rendered}"
