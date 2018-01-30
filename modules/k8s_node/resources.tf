@@ -50,7 +50,7 @@ resource "aws_launch_configuration" "node" {
 
   enable_monitoring = false
 
-  security_groups = ["${var.security_group}"]
+  security_groups = ["${var.security_groups}"]
 
   root_block_device = {
     volume_type           = "standard"

@@ -37,7 +37,9 @@ variable "instance_type" {
 
 variable "ssh_key_name" {}
 
-variable "security_group" {}
+variable "security_groups" {
+  type = "list"
+}
 
 variable "k8s_token" {
   description = "Kubeadm token. Generate a new token: `kubeadm token`"
