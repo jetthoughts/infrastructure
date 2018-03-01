@@ -98,7 +98,7 @@ variable "etcd_endpoints" {
 
 variable "certs_path" {
   description = "The path to the ZIP file with generated certificates. Example: kubeadm phase certs all"
-  default     = ""
+  default     = "./data/pki"
 }
 
 variable "master_addresses" {
@@ -120,3 +120,4 @@ variable "tags" {
     Name = "k8s-master"
   }
 }
+

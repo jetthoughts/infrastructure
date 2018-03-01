@@ -34,10 +34,10 @@ sed -i "s/,NodeRestriction//" /etc/kubernetes/manifests/kube-apiserver.yaml
 sleep 10
 
 export KUBECONFIG=/etc/kubernetes/admin.conf
-#kubectl --kubeconfig=/etc/kubernetes/admin.conf apply -f https://raw.githubusercontent.com/projectcalico/canal/master/k8s-install/1.7/rbac.yaml
-kubectl --kubeconfig=/etc/kubernetes/admin.conf apply -f https://raw.githubusercontent.com/rbankston/canal/15b94c829ab5c0201ca7ab831da7fe44c2708ac8/k8s-install/1.8/rbac.yaml
-#kubectl --kubeconfig=/etc/kubernetes/admin.conf apply -f https://raw.githubusercontent.com/projectcalico/canal/master/k8s-install/1.7/canal.yaml
-kubectl --kubeconfig=/etc/kubernetes/admin.conf apply -f https://raw.githubusercontent.com/rbankston/canal/15b94c829ab5c0201ca7ab831da7fe44c2708ac8/k8s-install/1.8/canal.yaml
+kubectl --kubeconfig=/etc/kubernetes/admin.conf apply -f https://raw.githubusercontent.com/projectcalico/canal/master/k8s-install/1.7/rbac.yaml
+#kubectl --kubeconfig=/etc/kubernetes/admin.conf apply -f https://raw.githubusercontent.com/rbankston/canal/15b94c829ab5c0201ca7ab831da7fe44c2708ac8/k8s-install/1.8/rbac.yaml
+kubectl --kubeconfig=/etc/kubernetes/admin.conf apply -f https://raw.githubusercontent.com/projectcalico/canal/master/k8s-install/1.7/canal.yaml
+#kubectl --kubeconfig=/etc/kubernetes/admin.conf apply -f https://raw.githubusercontent.com/rbankston/canal/15b94c829ab5c0201ca7ab831da7fe44c2708ac8/k8s-install/1.8/canal.yaml
 
 kubectl --kubeconfig=/etc/kubernetes/admin.conf get componentstatuses
 
