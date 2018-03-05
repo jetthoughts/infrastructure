@@ -1,37 +1,84 @@
-module "k8s_node" {
-  //  source = "github.com/jetthoughts/infrastructure/modules/k8s_node"
-  source            = "../../modules/k8s_node"
-  name              = "${var.cluster}"
-  cluster           = "${var.cluster}"
-  instance_type     = "r4.large"
-  version           = "${var.version}"
-  k8s_version       = "${var.k8s_version}"
-  master_ip         = "api.test.virginia.pubnative.io"
-  k8s_token         = "${var.k8s_token}"
-  availability_zone = "us-east-1a"
-  subnet_id         = "${var.subnet_id}"
-  image_id          = "${var.ami_id == "" ? data.aws_ami.centos.image_id : var.ami_id}"
-  security_groups   = ["${aws_security_group.k8s_nodes.id}"]
-  ssh_key_name      = "${aws_key_pair.k8s_key.key_name}"
-  spot_price        = "0.1"
-  min_size          = "2"
-  max_size          = "2"
+locals {
+  master_private_address = "${packet_device.masters.0.network.2.address}"
+}
 
-  node_labels = [
-    "beta.kubernetes.io/instance-lifecycle=spot",
-    "role=general",
-  ]
 
-  tags = [
-    {
-      key                 = "k8s.io/cluster-autoscaler/enabled"
-      value               = "true"
-      propagate_at_launch = false
-    },
-    {
-      key                 = "kubernetes.io/cluster/${var.cluster}"
-      value               = "true"
-      propagate_at_launch = false
-    },
-  ]
+resource "packet_device" "nodes" {
+  hostname = "node"
+  billing_cycle = "hourly"
+  project_id = "${packet_project.k8s_dev.id}"
+
+  // https://www.packet.net/developers/api/facilities/
+  facility = "ewr1"
+
+  // https://www.packet.net/developers/api/operatingsystems/
+  operating_system = "centos_7"
+
+  // https://www.packet.net/developers/api/plans/
+  plan = "baremetal_0"
+
+  connection {
+    type        = "ssh"
+    user        = "root"
+    private_key = "${file("${path.module}/assets/k8s")}"
+    host        = "${self.network.0.address}"
+  }
+
+  provisioner "remote-exec" {
+    inline = [
+      "mkdir -p /tmp/terraform/pki",
+    ]
+  }
+
+  provisioner "file" {
+    source      = "${path.module}/data/packages.sh"
+    destination = "/tmp/terraform/packages.sh"
+  }
+
+  provisioner "file" {
+    destination = "/tmp/terraform/pre_init_script.sh"
+    content      = <<EOF
+      set -x
+      "${var.pre_init_script}"
+  EOF
+  }
+
+  provisioner "file" {
+    source      = "${path.module}/data/disable_swap.sh"
+    destination = "/tmp/terraform/disable_swap.sh"
+  }
+
+  provisioner "file" {
+    source      = "${path.module}/data/k8s_kubelet_extra_args.sh"
+    destination = "/tmp/terraform/k8s_kubelet_extra_args.sh"
+  }
+
+  provisioner "file" {
+    content      = "${data.template_file.node_join.rendered}"
+    destination = "/tmp/terraform/node.sh"
+  }
+
+  provisioner "remote-exec" {
+    inline = [
+      "chmod +x /tmp/terraform/*.sh",
+      "sudo /tmp/terraform/packages.sh",
+      "sudo /tmp/terraform/pre_init_script.sh",
+      "sudo /tmp/terraform/disable_swap.sh",
+      "sudo /tmp/terraform/k8s_kubelet_extra_args.sh",
+      "sudo cat /etc/fstab",
+      "sudo /tmp/terraform/node.sh",
+      "sudo reboot",
+    ]
+  }
+}
+
+data "template_file" "node_join" {
+  template = "${file("${path.module}/data/node_join.tpl.sh")}"
+
+  vars {
+    k8s_token   = "${var.k8s_token}"
+    k8s_version = "${var.k8s_version}"
+    master_ip   = "${local.master_private_address}"
+    labels      = "${join(" ", var.node_labels)}"
+  }
 }

@@ -40,7 +40,7 @@ variable "k8s_version" {
 }
 
 variable "k8s_pod_network_cidr" {
-  default = ""
+  default = "10.244.0.0/16"
 }
 
 variable "k8s_ca_crt" {
@@ -71,4 +71,15 @@ variable "asset_path" {
 
 variable "kube_conf_remote_path" {
   default = "/root/"
+}
+
+// Nodes
+variable "node_labels" {
+  type = "list"
+  default = []
+}
+
+variable "pre_init_script" {
+  description = "Content to be run before the kubeadm."
+  default = ""
 }

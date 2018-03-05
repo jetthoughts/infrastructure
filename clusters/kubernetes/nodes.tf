@@ -11,7 +11,7 @@ module "k8s_node" {
   availability_zone = "us-east-1a"
   subnet_id         = "${var.subnet_id}"
   image_id          = "${var.ami_id == "" ? data.aws_ami.centos.image_id : var.ami_id}"
-  security_group    = "${aws_security_group.k8s_nodes.id}"
+  security_groups   = ["${aws_security_group.k8s_nodes.id}"]
   ssh_key_name      = "${aws_key_pair.k8s_key.key_name}"
   spot_price        = "0.1"
   min_size          = "2"

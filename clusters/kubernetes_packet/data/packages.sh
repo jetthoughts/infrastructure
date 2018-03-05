@@ -61,3 +61,10 @@ EOF
 sudo wget https://github.com/stedolan/jq/releases/download/jq-1.5/jq-linux64 -O /usr/local/bin/jq
 sudo chmod +x /usr/local/bin/jq
 /usr/local/bin/jq --version
+
+# For devicemapper clean locked resources
+sudo tee /etc/cron.d/clean-docker-devicemapper-vol <<-'EOF'
+*/30 * * * * root for dm in /dev/mapper/docker-*; do umount $dm 2> /dev/null ; dmsetup remove $dm 2> /dev/null ; done
+EOF
+
+sudo chmod 644 /etc/cron.d/clean-docker-devicemapper-vol

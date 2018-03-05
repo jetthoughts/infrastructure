@@ -1,18 +1,20 @@
-#!/usr/bin/env bash
+#!/bin/bash -xe
 
-# -x Print command traces before executing command.
-set -x
-# -e Exit immediately if a command exits with a non-zero status.
-set -e
+export PATH="/usr/local/bin:$PATH"
 
-export PRIVATE_HOSTNAME=$(curl http://instance-data/latest/meta-data/hostname)
+if [[ -z "$PRIVATE_IP" ]]; then
+  PRIVATE_IP=$(curl -s https://metadata.packet.net/metadata | jq .network.addresses[2].address -r)
+fi
 
-sysctl kernel.hostname=$PRIVATE_HOSTNAME
+if [[ -z "$PRIVATE_HOSTNAME" ]]; then
+  PRIVATE_HOSTNAME=$(curl -s https://metadata.packet.net/metadata | jq .hostname -r)
+fi
 
-kubeadm join --token="${k8s_token}" ${master_ip}:6443 --node-name="$PRIVATE_HOSTNAME" --discovery-token-unsafe-skip-ca-verification
 
-export NODE_LABELS="${labels}"
-export KUBELET_PATH="/etc/kubernetes/kubelet.conf"
+kubeadm join --token="${k8s_token}" ${master_ip}:6443 --node-name="$PRIVATE_IP" --discovery-token-unsafe-skip-ca-verification
+
+NODE_LABELS="${labels}"
+KUBELET_PATH="/etc/kubernetes/kubelet.conf"
 
 sleep 30
 

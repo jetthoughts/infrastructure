@@ -16,4 +16,8 @@ $ terraform apply -target=packet_project.k8s_dev
 $ ssh-keygen -f assets/k8s -C "miry.sof@gmail.com"
 ```
 
-5. 
+5. Create one master
+
+```bash
+$ terraform apply -target=packet_device.masters
+```
