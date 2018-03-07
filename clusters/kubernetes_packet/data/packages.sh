@@ -68,3 +68,13 @@ sudo tee /etc/cron.d/clean-docker-devicemapper-vol <<-'EOF'
 EOF
 
 sudo chmod 644 /etc/cron.d/clean-docker-devicemapper-vol
+
+for i in `seq 5 1`
+do
+  sleep $[ $i * 10 ]
+  docker ps && break || true
+done
+
+docker pull quay.io/calico/node:v2.6.1 || true
+docker pull quay.io/coreos/flannel:v0.9.1 || true
+docker pull quay.io/calico/cni:v1.11.0 || true

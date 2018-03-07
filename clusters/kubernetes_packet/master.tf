@@ -27,6 +27,11 @@ resource "packet_device" "masters" {
   }
 
   provisioner "file" {
+    source      = "${path.module}/data/kernel4.sh"
+    destination = "/tmp/terraform/kernel4.sh"
+  }
+
+  provisioner "file" {
     source      = "${path.module}/data/packages.sh"
     destination = "/tmp/terraform/packages.sh"
   }
@@ -74,6 +79,7 @@ resource "packet_device" "masters" {
   provisioner "remote-exec" {
     inline = [
       "chmod +x /tmp/terraform/*.sh",
+      "sudo /tmp/terraform/kernel4.sh",
       "sudo /tmp/terraform/packages.sh",
       "sudo /tmp/terraform/disable_swap.sh",
       "sudo /tmp/terraform/k8s_kubelet_extra_args.sh",

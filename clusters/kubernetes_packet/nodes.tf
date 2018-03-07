@@ -4,7 +4,8 @@ locals {
 
 
 resource "packet_device" "nodes" {
-  hostname = "node"
+  count = 1
+  hostname = "node${count.index}"
   billing_cycle = "hourly"
   project_id = "${packet_project.k8s_dev.id}"
 
@@ -28,6 +29,11 @@ resource "packet_device" "nodes" {
     inline = [
       "mkdir -p /tmp/terraform/pki",
     ]
+  }
+
+  provisioner "file" {
+    source      = "${path.module}/data/kernel4.sh"
+    destination = "/tmp/terraform/kernel4.sh"
   }
 
   provisioner "file" {
@@ -61,6 +67,7 @@ resource "packet_device" "nodes" {
   provisioner "remote-exec" {
     inline = [
       "chmod +x /tmp/terraform/*.sh",
+      "sudo /tmp/terraform/kernel4.sh",
       "sudo /tmp/terraform/packages.sh",
       "sudo /tmp/terraform/pre_init_script.sh",
       "sudo /tmp/terraform/disable_swap.sh",
