@@ -4,7 +4,7 @@ locals {
 
 
 resource "packet_device" "nodes" {
-  count = 1
+  count = "${var.nodes_count}"
   hostname = "node${count.index}"
   billing_cycle = "hourly"
   project_id = "${packet_project.k8s_dev.id}"

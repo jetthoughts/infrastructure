@@ -5,6 +5,10 @@ variable "cluster_size" {
   default = 1
 }
 
+variable "nodes_count" {
+  default = 1
+}
+
 variable "certs_path" {
   description = "The path to the ZIP file with generated certificates. Example: kubeadm phase certs all"
   default     = "data/pki"
