@@ -17,3 +17,13 @@ variable "name" {
   description = "Name of the cluster"
   default = "kubernetes"
 }
+
+variable "certs_path" {
+  description = "The path to the ZIP file with generated certificates. Example: kubeadm phase certs all"
+  default     = ""
+}
+
+variable "kube_version" {
+  description = "The version of kubeadm to use"
+  default = "v1.11.0-alpha.2"
+}
