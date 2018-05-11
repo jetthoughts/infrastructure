@@ -73,6 +73,13 @@ variable "tags" {
   ]
 }
 
+variable "target_group_arns" {
+  type        = "list"
+  description = "Attach instances to target group"
+
+  default = []
+}
+
 variable "pre_init_script" {
   description = "Content to be run before the kubeadm."
   default = ""

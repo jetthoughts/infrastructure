@@ -114,4 +114,5 @@ resource "aws_autoscaling_group" "node" {
   ]
 
   tags = ["${var.tags}"]
+  target_group_arns = ["${var.target_group_arns}"]
 }
