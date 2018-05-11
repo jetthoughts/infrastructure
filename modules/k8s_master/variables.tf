@@ -16,8 +16,8 @@ variable "k8s_token" {
   description = "Kubeadm token. Generate a new token: `kubeadm token`"
 }
 
-variable "k8s_version" {
-  default = "v1.8.4"
+variable "kube_version" {
+  default = "v1.10.2"
 }
 
 variable "k8s_pod_network_cidr" {

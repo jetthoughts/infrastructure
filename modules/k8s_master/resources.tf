@@ -4,7 +4,7 @@ locals {
 
 resource "aws_instance" "masters" {
   count         = "${var.cluster_size}"
-  depends_on    = ["aws_iam_role_policy.masters"]
+  depends_on    = ["aws_iam_role_policy.masters", "module.certificates"]
   ami           = "${var.image_id}"
   instance_type = "${var.instance_type}"
 
@@ -19,7 +19,7 @@ resource "aws_instance" "masters" {
 
   root_block_device = {
     volume_type           = "standard"
-    volume_size           = 20
+    volume_size           = 8
     delete_on_termination = true
     iops                  = 0
   }
@@ -93,7 +93,7 @@ EOF
       "sudo /tmp/terraform/kubeadm_config.sh",
       "sudo /tmp/terraform/master.sh",
       "sudo sh /tmp/terraform/admin.sh",
-      "sudo reboot",
+      "sudo shutdown -r +1",
     ]
   }
 }
@@ -103,7 +103,7 @@ data "template_file" "master_user_data" {
 
   vars {
     k8s_token              = "${var.k8s_token}"
-    k8s_version            = "${var.k8s_version}"
+    k8s_version            = "${var.kube_version}"
     k8s_pod_network_cidr   = "${var.k8s_pod_network_cidr}"
     domain                 = "api.${var.name}.${var.datacenter}.${var.dns_primary_domain}"
     google_oauth_client_id = "${var.google_oauth_client_id}"
@@ -118,7 +118,7 @@ data "template_file" "kubeadm_config" {
 
   vars {
     k8s_token              = "${var.k8s_token}"
-    k8s_version            = "${var.k8s_version}"
+    k8s_version            = "${var.kube_version}"
     k8s_pod_network_cidr   = "${var.k8s_pod_network_cidr}"
     domain                 = "api.${var.name}.${var.datacenter}.${var.dns_primary_domain}"
     google_oauth_client_id = "${var.google_oauth_client_id}"

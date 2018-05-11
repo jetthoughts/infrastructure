@@ -23,6 +23,12 @@ variable "certs_path" {
   default     = ""
 }
 
+variable "cert_sans" {
+  description = "The list of additinal ips or DNS to access master api server. Splited by comma."
+  type        = "string"
+  default     = ""
+}
+
 variable "kube_version" {
   description = "The version of kubeadm to use"
   default = "v1.11.0-alpha.2"
