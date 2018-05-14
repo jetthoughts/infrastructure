@@ -43,10 +43,6 @@ variable "availability_zone" {
 
 variable "subnet_id" {}
 
-variable "version" {
-  default = "v20171122"
-}
-
 variable "kube_conf_remote_path" {
   default = "/home/centos/"
 }
@@ -94,6 +90,12 @@ variable "etcd_endpoints" {
   type        = "list"
   description = "The external etcd cluster."
   default     = []
+}
+
+variable "etcd_prefix" {
+  type        = "string"
+  description = "ETCD namespace for the clsuter. Default: /registry"
+  default     = "/registry"
 }
 
 variable "certs_path" {

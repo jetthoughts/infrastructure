@@ -6,12 +6,8 @@ variable "cluster" {
   default = "staging"
 }
 
-variable "version" {
-  default = "v20171205"
-}
-
-variable "k8s_version" {
-  default = "v1.8.4"
+variable "kube_version" {
+  default = "v1.10.2"
 }
 
 variable "node_labels" {

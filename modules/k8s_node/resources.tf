@@ -3,7 +3,6 @@ data "template_file" "node_join" {
 
   vars {
     k8s_token   = "${var.k8s_token}"
-    k8s_version = "${var.k8s_version}"
     master_ip   = "${var.master_ip}"
     labels      = "${join(" ", var.node_labels)}"
   }
@@ -40,7 +39,7 @@ data "template_cloudinit_config" "node-init" {
 
 resource "aws_launch_configuration" "node" {
   depends_on           = ["aws_iam_role_policy.nodes"]
-  name_prefix          = "k8s-${var.name}-${var.k8s_version}-node-"
+  name_prefix          = "k8s-${var.name}-${var.kube_version}-node-"
   image_id             = "${var.image_id}"
   user_data            = "${data.template_cloudinit_config.node-init.rendered}"
   instance_type        = "${var.instance_type}"
@@ -79,39 +78,6 @@ resource "aws_autoscaling_group" "node" {
   min_size             = "${var.min_size}"
   max_size             = "${var.max_size}"
   launch_configuration = "${aws_launch_configuration.node.name}"
-
-  tags = [
-    {
-      propagate_at_launch = true
-      key                 = "Cluster"
-      value               = "k8s-${var.cluster}"
-    },
-    {
-      propagate_at_launch = true
-      key                 = "Name"
-      value               = "k8s-${var.cluster}-node"
-    },
-    {
-      propagate_at_launch = true
-      key                 = "Role"
-      value               = "k8s-node"
-    },
-    {
-      propagate_at_launch = true
-      key                 = "K8SVersion"
-      value               = "${var.k8s_version}"
-    },
-    {
-      propagate_at_launch = true
-      key                 = "KubernetesCluster"
-      value               = "${var.cluster}"
-    },
-    {
-      propagate_at_launch = true
-      key                 = "kubernetes.io/cluster/${var.cluster}"
-      value               = "${var.cluster}"
-    },
-  ]
 
   tags = ["${var.tags}"]
   target_group_arns = ["${var.target_group_arns}"]

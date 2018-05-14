@@ -3,29 +3,32 @@ locals {
 }
 
 resource "aws_instance" "masters" {
-  count         = "${var.cluster_size}"
-  depends_on    = ["aws_iam_role_policy.masters", "module.certificates"]
-  ami           = "${var.image_id}"
-  instance_type = "${var.instance_type}"
+  count                   = "${var.cluster_size}"
+  depends_on              = [
+    "aws_iam_role_policy.masters",
+    "module.certificates"]
+  ami                     = "${var.image_id}"
+  instance_type           = "${var.instance_type}"
 
   key_name                = "${var.ssh_key_name}"
   iam_instance_profile    = "${aws_iam_instance_profile.masters.id}"
   monitoring              = false
-  vpc_security_group_ids  = ["${var.security_groups}"]
+  vpc_security_group_ids  = [
+    "${var.security_groups}"]
   availability_zone       = "${var.availability_zone}"
   subnet_id               = "${var.subnet_id}"
   private_ip              = "${element(var.master_addresses, count.index)}"
   disable_api_termination = true
 
-  root_block_device = {
+  root_block_device       = {
     volume_type           = "standard"
     volume_size           = 8
     delete_on_termination = true
     iops                  = 0
   }
 
-  tags        = "${local.ec2_tags}"
-  volume_tags = "${local.ec2_tags}"
+  tags                    = "${local.ec2_tags}"
+  volume_tags             = "${local.ec2_tags}"
 
   ////  Provision
   connection {
@@ -75,7 +78,7 @@ resource "aws_instance" "masters" {
   }
 
   provisioner "file" {
-    content = <<EOF
+    content     = <<EOF
 set -x
 kubectl --kubeconfig=/etc/kubernetes/admin.conf create clusterrolebinding cluster-admin-${var.admin_email} --clusterrole=cluster-admin --user=${var.admin_email} || true
 kubectl --kubeconfig=/etc/kubernetes/admin.conf create clusterrolebinding admin-${var.admin_email} --clusterrole=admin --user=${var.admin_email} || true
@@ -118,12 +121,13 @@ data "template_file" "kubeadm_config" {
 
   vars {
     k8s_token              = "${var.k8s_token}"
-    k8s_version            = "${var.kube_version}"
+    kube_version           = "${var.kube_version}"
     k8s_pod_network_cidr   = "${var.k8s_pod_network_cidr}"
     domain                 = "api.${var.name}.${var.datacenter}.${var.dns_primary_domain}"
     google_oauth_client_id = "${var.google_oauth_client_id}"
     cluster_size           = "${var.cluster_size}"
     master_ips             = "\"${join("\" \"", concat(var.master_addresses, var.cert_sans))}\""
     etcd_endpoints         = "\"${join("\" \"", var.etcd_endpoints)}\""
+    etcd_prefix            = "${var.etcd_prefix}"
   }
 }

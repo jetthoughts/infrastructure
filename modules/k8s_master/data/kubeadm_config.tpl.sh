@@ -13,7 +13,9 @@ KUBEADM_CONFIG="/etc/kubernetes/kubeadm.yml"
 cat <<EOF > $KUBEADM_CONFIG
 apiVersion: kubeadm.k8s.io/v1alpha1
 kind: MasterConfiguration
-kubernetesVersion: ${k8s_version}
+api:
+  controlPlaneEndpoint: ${domain}
+kubernetesVersion: ${kube_version}
 nodeName: $PRIVATE_HOSTNAME
 token: ${k8s_token}
 tokenTTL: 0h0m0s
@@ -23,6 +25,7 @@ apiServerExtraArgs:
   oidc-issuer-url: "https://accounts.google.com"
   oidc-username-claim: email
   oidc-client-id: ${google_oauth_client_id}
+  etcd-prefix: "${etcd_prefix}"
 
 networking:
   podSubnet: ${k8s_pod_network_cidr}
