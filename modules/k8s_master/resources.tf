@@ -1,5 +1,6 @@
 locals {
   ec2_tags = "${merge(map("Name", "k8s-${var.name}-master", "KubernetesCluster", "${var.name}", "kubernetes.io/cluster/${var.name}", "true"),var.tags)}"
+  pki_path = "${var.certs_path}/pki/"
 }
 
 resource "aws_instance" "masters" {
@@ -63,7 +64,7 @@ resource "aws_instance" "masters" {
   }
 
   provisioner "file" {
-    source      = "${var.certs_path}/"
+    source      = "${local.pki_path}/"
     destination = "/tmp/terraform/pki"
   }
 
