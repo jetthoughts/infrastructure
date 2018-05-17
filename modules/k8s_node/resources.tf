@@ -5,6 +5,7 @@ data "template_file" "node_join" {
     k8s_token   = "${var.k8s_token}"
     master_ip   = "${var.master_ip}"
     labels      = "${join(" ", var.node_labels)}"
+    k8s_node_taints  = "${var.k8s_node_taints}"
   }
 }
 

@@ -80,3 +80,9 @@ variable "pre_init_script" {
   description = "Content to be run before the kubeadm."
   default = ""
 }
+
+variable "k8s_node_taints" {
+  type        = "list"
+  description = "List of taints to apply to this group of nodes"
+  default     = []
+}
