@@ -8,7 +8,7 @@ data "template_file" "node_join" {
   }
 }
 
-data "template_cloudinit_config" "node-init" {
+data "template_cloudinit_config" "node_init" {
   gzip          = false
   base64_encode = false
 
@@ -19,13 +19,25 @@ data "template_cloudinit_config" "node-init" {
   }
 
   part {
-    filename     = "01node.sh"
+    filename     = "01packages.sh"
+    content_type = "text/x-shellscript"
+    content      = "${file("${path.module}/data/packages.sh")}"
+  }
+
+  part {
+    filename     = "02kube_packages.sh"
+    content_type = "text/x-shellscript"
+    content      = "${data.template_file.kube_packages.rendered}"
+  }
+
+  part {
+    filename     = "10node.sh"
     content_type = "text/x-shellscript"
     content      = "${data.template_file.node_join.rendered}"
   }
 
   part {
-    filename     = "02ks8_args.sh"
+    filename     = "20ks8_args.sh"
     content_type = "text/x-shellscript"
     content      = "${file("${path.module}/data/k8s_kubelet_extra_args.sh")}"
   }
@@ -41,7 +53,7 @@ resource "aws_launch_configuration" "node" {
   depends_on           = ["aws_iam_role_policy.nodes"]
   name_prefix          = "k8s-${var.name}-${var.kube_version}-node-"
   image_id             = "${var.image_id}"
-  user_data            = "${data.template_cloudinit_config.node-init.rendered}"
+  user_data            = "${data.template_cloudinit_config.node_init.rendered}"
   instance_type        = "${var.instance_type}"
   spot_price           = "${var.spot_price}"
   key_name             = "${var.ssh_key_name}"
@@ -81,4 +93,12 @@ resource "aws_autoscaling_group" "node" {
 
   tags = ["${var.tags}"]
   target_group_arns = ["${var.target_group_arns}"]
+}
+
+data "template_file" "kube_packages" {
+  template = "${file("${path.module}/data/kube_packages.tpl.sh")}"
+
+  vars {
+    kube_version = "${var.kube_version}"
+  }
 }

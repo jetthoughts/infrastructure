@@ -1,35 +1,45 @@
 locals {
   ec2_tags = "${merge(map("Name", "k8s-${var.name}-master", "KubernetesCluster", "${var.name}", "kubernetes.io/cluster/${var.name}", "true"),var.tags)}"
   pki_path = "${var.certs_path}/pki/"
+  domain   = "api.${var.name}.${var.datacenter}.${var.dns_primary_domain}"
+  internal_domain   = "internal.${var.name}.${var.datacenter}.${var.dns_primary_domain}"
 }
 
 resource "aws_instance" "masters" {
-  count                   = "${var.cluster_size}"
-  depends_on              = [
-    "aws_iam_role_policy.masters",
-    "module.certificates"]
-  ami                     = "${var.image_id}"
-  instance_type           = "${var.instance_type}"
+  count = "${var.cluster_size}"
 
-  key_name                = "${var.ssh_key_name}"
-  iam_instance_profile    = "${aws_iam_instance_profile.masters.id}"
-  monitoring              = false
-  vpc_security_group_ids  = [
-    "${var.security_groups}"]
+  depends_on = [
+    "aws_iam_role_policy.masters",
+    "module.certificates",
+    "aws_route53_record.internal",
+    "aws_route53_record.api",
+  ]
+
+  ami           = "${var.image_id}"
+  instance_type = "${var.instance_type}"
+
+  key_name             = "${var.ssh_key_name}"
+  iam_instance_profile = "${aws_iam_instance_profile.masters.id}"
+  monitoring           = false
+
+  vpc_security_group_ids = [
+    "${var.security_groups}",
+  ]
+
   availability_zone       = "${var.availability_zone}"
   subnet_id               = "${var.subnet_id}"
   private_ip              = "${element(var.master_addresses, count.index)}"
   disable_api_termination = true
 
-  root_block_device       = {
+  root_block_device = {
     volume_type           = "standard"
     volume_size           = 8
     delete_on_termination = true
     iops                  = 0
   }
 
-  tags                    = "${local.ec2_tags}"
-  volume_tags             = "${local.ec2_tags}"
+  tags        = "${local.ec2_tags}"
+  volume_tags = "${local.ec2_tags}"
 
   ////  Provision
   connection {
@@ -51,6 +61,11 @@ resource "aws_instance" "masters" {
   provisioner "file" {
     source      = "${path.module}/data/packages.sh"
     destination = "/tmp/terraform/packages.sh"
+  }
+
+  provisioner "file" {
+    content     = "${data.template_file.kube_packages.rendered}"
+    destination = "/tmp/terraform/kube_packages.sh"
   }
 
   provisioner "file" {
@@ -79,7 +94,7 @@ resource "aws_instance" "masters" {
   }
 
   provisioner "file" {
-    content     = <<EOF
+    content = <<EOF
 set -x
 kubectl --kubeconfig=/etc/kubernetes/admin.conf create clusterrolebinding cluster-admin-${var.admin_email} --clusterrole=cluster-admin --user=${var.admin_email} || true
 kubectl --kubeconfig=/etc/kubernetes/admin.conf create clusterrolebinding admin-${var.admin_email} --clusterrole=admin --user=${var.admin_email} || true
@@ -92,6 +107,7 @@ EOF
     inline = [
       "chmod +x /tmp/terraform/*.sh",
       "sudo /tmp/terraform/packages.sh",
+      "sudo /tmp/terraform/kube_packages.sh",
       "sudo /tmp/terraform/k8s_kubelet_extra_args.sh",
       "sudo /tmp/terraform/certificates.sh",
       "sudo /tmp/terraform/kubeadm_config.sh",
@@ -124,11 +140,19 @@ data "template_file" "kubeadm_config" {
     k8s_token              = "${var.k8s_token}"
     kube_version           = "${var.kube_version}"
     k8s_pod_network_cidr   = "${var.k8s_pod_network_cidr}"
-    domain                 = "api.${var.name}.${var.datacenter}.${var.dns_primary_domain}"
+    domain                 = "${local.domain}"
     google_oauth_client_id = "${var.google_oauth_client_id}"
     cluster_size           = "${var.cluster_size}"
     master_ips             = "\"${join("\" \"", concat(var.master_addresses, var.cert_sans))}\""
     etcd_endpoints         = "\"${join("\" \"", var.etcd_endpoints)}\""
     etcd_prefix            = "${var.etcd_prefix}"
+  }
+}
+
+data "template_file" "kube_packages" {
+  template = "${file("${path.module}/data/kube_packages.tpl.sh")}"
+
+  vars {
+    kube_version = "${var.kube_version}"
   }
 }

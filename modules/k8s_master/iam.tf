@@ -9,7 +9,7 @@ resource "aws_iam_instance_profile" "masters" {
 resource "aws_iam_role" "masters" {
   name               = "k8s-${var.name}-masters"
   assume_role_policy = "${file("${path.module}/data/aws_iam_role_policy")}"
-  path = "/k8s/"
+  path               = "/k8s/"
 }
 
 resource "aws_iam_role_policy" "masters" {

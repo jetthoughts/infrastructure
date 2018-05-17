@@ -15,15 +15,10 @@ do
   docker ps && break || true
 done
 
-docker pull quay.io/coreos/flannel:v0.8.0 || true
 docker pull gcr.io/google_containers/kube-apiserver-amd64:${k8s_version} || true
 docker pull gcr.io/google_containers/kube-controller-manager-amd64:${k8s_version} || true
 docker pull gcr.io/google_containers/kube-scheduler-amd64:${k8s_version} || true
 docker pull gcr.io/google_containers/kube-proxy-amd64:${k8s_version} || true
-docker pull gcr.io/google_containers/pause-amd64:3.0 || true
-docker pull quay.io/calico/node:v2.6.1 || true
-docker pull quay.io/calico/cni:v1.10.0 || true
-docker pull gcr.io/google_containers/pause-amd64:3.0 || true
 
 kubeadm init --config /etc/kubernetes/kubeadm.yml
 
@@ -32,6 +27,13 @@ kubeadm init --config /etc/kubernetes/kubeadm.yml
 sed -i "s/,NodeRestriction//" /etc/kubernetes/manifests/kube-apiserver.yaml
 
 sleep 10
+
+echo -n "Waiting for apiserver to be ready..."
+while ! curl --silent -f -k https://${domain}:6443/healthz > /dev/null; do
+  sleep 5;
+  echo -n '.';
+done;
+echo 'ready!'
 
 export KUBECONFIG=/etc/kubernetes/admin.conf
 kubectl --kubeconfig=/etc/kubernetes/admin.conf apply -f https://raw.githubusercontent.com/projectcalico/canal/master/k8s-install/1.7/rbac.yaml

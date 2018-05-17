@@ -3,7 +3,7 @@ resource "aws_route53_record" "api" {
   name    = "api.${var.name}.${var.datacenter}"
   type    = "A"
   ttl     = "300"
-  records = ["${aws_instance.masters.*.private_ip}"]
+  records = "${var.master_addresses}"
 }
 
 resource "aws_route53_record" "internal" {
@@ -11,5 +11,5 @@ resource "aws_route53_record" "internal" {
   name    = "internal.${var.name}.${var.datacenter}"
   type    = "A"
   ttl     = "300"
-  records = ["${aws_instance.masters.*.private_ip}"]
+  records = "${var.master_addresses}"
 }

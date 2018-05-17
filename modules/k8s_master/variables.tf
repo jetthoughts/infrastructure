@@ -116,10 +116,10 @@ variable "cert_sans" {
 }
 
 variable "tags" {
-  type = "map"
+  type        = "map"
   description = "AWS instance and volume tags"
+
   default = {
     Name = "k8s-master"
   }
 }
-

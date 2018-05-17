@@ -1,5 +1,5 @@
 variable "host_connection" {
-  type = "map"
+  type    = "map"
   default = {}
 }
 
@@ -15,7 +15,7 @@ variable "asset_path" {
 
 variable "name" {
   description = "Name of the cluster"
-  default = "kubernetes"
+  default     = "kubernetes"
 }
 
 variable "certs_path" {
@@ -31,5 +31,5 @@ variable "cert_sans" {
 
 variable "kube_version" {
   description = "The version of kubeadm to use"
-  default = "v1.11.0-alpha.2"
+  default     = "v1.11.0-alpha.2"
 }
