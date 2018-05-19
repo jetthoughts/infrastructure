@@ -6,6 +6,6 @@ resource "null_resource" "generate_pki" {
 
 resource "null_resource" "extract_admin_key" {
   provisioner "local-exec" {
-    command = "ruby ${path.module}/data/extract_crt.rb -s ${var.certs_path}/pki/${var.name}.conf -d ${var.certs_path}"
+    command = "ruby ${path.module}/data/extract_crt.rb -s ${var.certs_path}/admin.conf -d ${var.certs_path}"
   }
 }

@@ -81,7 +81,7 @@ variable "pre_init_script" {
   default = ""
 }
 
-variable "k8s_node_taints" {
+variable "kube_node_taints" {
   type        = "list"
   description = "List of taints to apply to this group of nodes"
   default     = []

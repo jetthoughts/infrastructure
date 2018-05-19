@@ -11,8 +11,8 @@ sysctl kernel.hostname=$PRIVATE_HOSTNAME
 
 kubeadm join --token="${k8s_token}" ${master_ip}:6443 --node-name="$PRIVATE_HOSTNAME" --discovery-token-unsafe-skip-ca-verification
 
-export NODE_LABELS="${labels}"
-export NODE_TAINTS="${k8s_node_taints}"
+export NODE_LABELS="${node_labels}"
+export NODE_TAINTS="${node_taints}"
 export KUBELET_PATH="/etc/kubernetes/kubelet.conf"
 
 sleep 30
@@ -29,7 +29,7 @@ if [ "$NODE_LABELS" != "" ]; then
 fi
 
 if [ "$NODE_TAINTS" != "" ]; then
-  kubectl --kubeconfig=$KUBELET_PATH taints nodes $PRIVATE_HOSTNAME $NODE_TAINTS
+  kubectl --kubeconfig=$KUBELET_PATH taint nodes $PRIVATE_HOSTNAME $NODE_TAINTS
 fi
 
 # If master_ip is the host kubeadm resolve it and use ip. It revert such changes
