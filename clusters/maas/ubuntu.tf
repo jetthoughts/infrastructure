@@ -13,7 +13,7 @@ resource "null_resource" "packages" {
     type = "ssh"
     user = "ubuntu"
     private_key = "${file("~/.ssh/id_rsa")}"
-    host = "${var.server_ip_eth}"
+    host = "${var.server_ip}"
   }
 
   provisioner "remote-exec" {
@@ -35,7 +35,7 @@ resource "null_resource" "hostname" {
     type = "ssh"
     user = "ubuntu"
     private_key = "${file("~/.ssh/id_rsa")}"
-    host = "${var.server_ip_eth}"
+    host = "${var.server_ip}"
   }
 
   provisioner "remote-exec" {
@@ -56,7 +56,7 @@ resource "null_resource" "wifi" {
     type = "ssh"
     user = "ubuntu"
     private_key = "${file("~/.ssh/id_rsa")}"
-    host = "${var.server_ip_eth}"
+    host = "${var.server_ip}"
   }
 
   provisioner "remote-exec" {
@@ -82,7 +82,7 @@ resource "null_resource" "monitoring" {
   connection {
     type = "ssh"
     user = "ubuntu"
-    host = "${var.server_ip_wlan}"
+    host = "${var.server_ip}"
     private_key = "${file("~/.ssh/id_rsa")}"
   }
 
@@ -96,5 +96,5 @@ resource "null_resource" "monitoring" {
 }
 
 output "netdata" {
-  value = "http://${var.server_ip_wlan}:19999"
+  value = "http://${var.server_ip}:19999"
 }

@@ -2,7 +2,7 @@ resource "null_resource" "zram" {
   connection {
     type = "ssh"
     user = "ubuntu"
-    host = "${var.server_ip_wlan}"
+    host = "${var.server_ip}"
     private_key = "${file("~/.ssh/id_rsa")}"
   }
 
@@ -29,7 +29,7 @@ resource "null_resource" "maas-packages" {
   connection {
     type = "ssh"
     user = "ubuntu"
-    host = "${var.server_ip_wlan}"
+    host = "${var.server_ip}"
     private_key = "${file("~/.ssh/id_rsa")}"
   }
 
@@ -48,7 +48,7 @@ resource "null_resource" "maas-eth-network" {
   connection {
     type = "ssh"
     user = "ubuntu"
-    host = "${var.server_ip_eth}"
+    host = "${var.server_ip}"
     private_key = "${file("~/.ssh/id_rsa")}"
   }
 
@@ -78,7 +78,7 @@ resource "null_resource" "maas-admin" {
   connection {
     type = "ssh"
     user = "ubuntu"
-    host = "${var.server_ip_wlan}"
+    host = "${var.server_ip}"
     private_key = "${file("~/.ssh/id_rsa")}"
   }
 
@@ -90,5 +90,5 @@ resource "null_resource" "maas-admin" {
 }
 
 output "maas" {
-  value = "http://${var.server_ip_wlan}:5240/MAAS"
+  value = "http://${var.server_ip}:5240/MAAS"
 }
