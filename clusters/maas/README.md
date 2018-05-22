@@ -15,9 +15,9 @@ $ terraform apply -target=null_resource.zram -var 'server_ip=10.0.0.1'
 ## Install Maas packages
 
 ```shell
-$ terraform apply -target=null_resource.maas-packages -var 'server_ip=10.0.0.1 
-$ terraform apply -target=null_resource.maas-admin -var 'server_ip=10.0.0.1 
-$ terraform apply -target=null_resource.maas-eth-network -var 'server_ip=10.0.0.1 
+$ terraform apply -target=null_resource.maas-packages -var 'server_ip=10.0.0.1
+$ terraform apply -target=null_resource.maas-admin -var 'server_ip=10.0.0.1
+$ terraform apply -target=null_resource.maas-eth-network -var 'server_ip=10.0.0.1
 ```
 
 ## Install Maas Node
@@ -32,4 +32,10 @@ device_tree_address=0x02008000
 dhcp
 pxe get
 pxe boot
+```
+
+### Check DHCPD
+
+```
+sudo tcpdump -i eth0 port bootpc -v
 ```
