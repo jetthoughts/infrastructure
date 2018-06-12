@@ -31,7 +31,7 @@ apiServerExtraArgs:
 #  CoreDNS: true
 
 controllerManagerExtraArgs:
-  - --horizontal-pod-autoscaler-use-rest-clients=false
+  horizontal-pod-autoscaler-use-rest-clients: "false"
 
 networking:
   podSubnet: ${k8s_pod_network_cidr}

@@ -14,4 +14,4 @@ docker run --rm -v $output/pki:/etc/kubernetes/pki miry/kubernetes:$version /bin
 docker run --rm -v $output:/etc/kubernetes miry/kubernetes:$version \
        /bin/kubeadm alpha phase kubeconfig admin
 docker run --rm -v $output:/etc/kubernetes miry/kubernetes:$version \
-       /bin/kubeadm alpha phase kubeconfig user --client-name="user" > $output/user.conf
+       sh -c '/bin/kubeadm alpha phase kubeconfig user --client-name="user" 2>/dev/null' > $output/user.conf
