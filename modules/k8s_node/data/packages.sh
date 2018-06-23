@@ -24,7 +24,7 @@ EOF
 
 sudo setenforce 0 || true
 
-sudo yum install -y docker kubeadm kubelet kubectl kubernetes-cni \
+sudo yum install -y docker kubeadm kubelet kubectl kubernetes-cni cri-tools \
                ceph-common # To use Rook : Persistent Storage
 
 cat <<EOF | sudo tee /etc/sysctl.d/k8s.conf
