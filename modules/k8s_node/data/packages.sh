@@ -41,8 +41,8 @@ sudo sysctl --system
 sudo systemctl enable docker && sudo systemctl start docker
 sudo systemctl enable kubelet && sudo systemctl start kubelet
 
-sudo modprobe ip_vs
-echo ip_vs | sudo tee -a /etc/modules-load.d/99-ip_vs.conf
+sudo modprobe ip_vs ip_vs_rr ip_vs_wrr ip_vs_sh nf_conntrack_ipv4
+echo -e "ip_vs\nip_vs_rr\nip_vs_wrr\nip_vs_sh\nnf_conntrack_ipv4" | sudo tee -a /etc/modules-load.d/99-ip_vs.conf
 
 cat <<EOF | sudo tee /etc/sysconfig/modules/ip_vc.modules
 #!/bin/sh
@@ -53,7 +53,7 @@ cat <<EOF | sudo tee /etc/sysconfig/modules/ip_vc.modules
 /sbin/modinfo -F filename ip_vs >/dev/null 2>&1
 if [ $? -eq 0 ]
 then
-  modprobe ip_vs >/dev/null 2>&1
+  modprobe ip_vs ip_vs_rr ip_vs_wrr ip_vs_sh nf_conntrack_ipv4 >/dev/null 2>&1
 fi
 
 EOF
