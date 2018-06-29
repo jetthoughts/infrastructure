@@ -30,6 +30,7 @@ sudo yum install -y docker kubeadm kubelet kubectl kubernetes-cni cri-tools \
 cat <<EOF | sudo tee /etc/sysctl.d/k8s.conf
 net.bridge.bridge-nf-call-ip6tables = 1
 net.bridge.bridge-nf-call-iptables = 1
+net.ipv4.ip_forward = 1
 EOF
 
 cat <<EOF | sudo tee /etc/sysctl.d/10-disable-ipv6.conf

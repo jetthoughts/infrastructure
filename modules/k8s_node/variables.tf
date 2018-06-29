@@ -7,7 +7,7 @@ variable "cluster" {
 }
 
 variable "kube_version" {
-  default = "v1.10.2"
+  default = "v1.11.0"
 }
 
 variable "node_labels" {

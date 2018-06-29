@@ -9,10 +9,17 @@ export PRIVATE_HOSTNAME=$(curl http://instance-data/latest/meta-data/hostname)
 
 sysctl kernel.hostname=$PRIVATE_HOSTNAME
 
-kubeadm join --token="${k8s_token}" ${master_ip}:6443 --node-name="$PRIVATE_HOSTNAME" --discovery-token-unsafe-skip-ca-verification
+for i in `seq 5 1`
+do
+  sleep $[ $i * 10 ]
+  docker ps && break || true
+done
+
+docker pull gcr.io/google_containers/kube-proxy-amd64:${kube_version} || true
+
+kubeadm join --token="${kube_token}" ${master_ip}:6443 --node-name="$PRIVATE_HOSTNAME" --discovery-token-unsafe-skip-ca-verification
 
 export NODE_LABELS="${node_labels}"
-export NODE_TAINTS="${node_taints}"
 export KUBELET_PATH="/etc/kubernetes/kubelet.conf"
 
 sleep 30
@@ -26,10 +33,6 @@ done
 
 if [ "$NODE_LABELS" != "" ]; then
   kubectl --kubeconfig=$KUBELET_PATH label node/$PRIVATE_HOSTNAME $NODE_LABELS
-fi
-
-if [ "$NODE_TAINTS" != "" ]; then
-  kubectl --kubeconfig=$KUBELET_PATH taint nodes $PRIVATE_HOSTNAME $NODE_TAINTS
 fi
 
 # If master_ip is the host kubeadm resolve it and use ip. It revert such changes

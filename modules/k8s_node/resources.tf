@@ -2,10 +2,19 @@ data "template_file" "node_join" {
   template = "${file("${path.module}/data/node_join.tpl.sh")}"
 
   vars {
-    k8s_token   = "${var.k8s_token}"
+    kube_version = "${var.kube_version}"
+    kube_token   = "${var.k8s_token}"
     master_ip   = "${var.master_ip}"
     node_labels  = "${join(" ", var.node_labels)}"
-    node_taints  = "${join(" ", var.kube_node_taints)}"
+  }
+}
+
+data "template_file" "kube_args" {
+  template = "${file("${path.module}/data/k8s_kubelet_extra_args.tpl.sh")}"
+
+  vars {
+    node_labels  = "${join(",", var.node_labels)}"
+    node_taints  = "${join(",", var.kube_node_taints)}"
   }
 }
 
@@ -38,9 +47,9 @@ data "template_cloudinit_config" "node_init" {
   }
 
   part {
-    filename     = "20ks8_args.sh"
+    filename     = "20kube_args.sh"
     content_type = "text/x-shellscript"
-    content      = "${file("${path.module}/data/k8s_kubelet_extra_args.sh")}"
+    content      = "${data.template_file.kube_args.rendered}"
   }
 
   part {

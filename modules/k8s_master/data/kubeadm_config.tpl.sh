@@ -36,6 +36,17 @@ controllerManagerExtraArgs:
 networking:
   podSubnet: ${k8s_pod_network_cidr}
 
+kubeletConfiguration:
+  baseConfig:
+    authentication:
+      webhook:
+        enabled: true
+    cgroupDriver: /systemd/system.slice
+
+kubeProxy:
+  config:
+    mode: ipvs
+
 apiServerCertSANs:
 - localhost
 - 127.0.0.1
