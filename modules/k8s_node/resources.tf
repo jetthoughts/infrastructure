@@ -41,15 +41,15 @@ data "template_cloudinit_config" "node_init" {
   }
 
   part {
-    filename     = "10node.sh"
+    filename     = "08kube_args.sh"
     content_type = "text/x-shellscript"
-    content      = "${data.template_file.node_join.rendered}"
+    content      = "${data.template_file.kube_args.rendered}"
   }
 
   part {
-    filename     = "20kube_args.sh"
+    filename     = "10node.sh"
     content_type = "text/x-shellscript"
-    content      = "${data.template_file.kube_args.rendered}"
+    content      = "${data.template_file.node_join.rendered}"
   }
 
   part {
