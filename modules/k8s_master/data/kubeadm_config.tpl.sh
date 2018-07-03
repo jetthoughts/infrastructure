@@ -11,7 +11,7 @@ sysctl kernel.hostname=$PRIVATE_HOSTNAME
 KUBEADM_CONFIG="/etc/kubernetes/kubeadm.yml"
 
 cat <<EOF > $KUBEADM_CONFIG
-apiVersion: kubeadm.k8s.io/v1alpha2
+apiVersion: kubeadm.k8s.io/v1alpha1
 kind: MasterConfiguration
 api:
   controlPlaneEndpoint: ${domain}
