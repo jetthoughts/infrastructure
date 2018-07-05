@@ -46,6 +46,12 @@ kubeletConfiguration:
 kubeProxy:
   config:
     mode: ipvs
+    conntrack:
+      max: 2097152
+      maxPerCore: 524288
+      min: 524288
+      tcpCloseWaitTimeout: 0h10m0s
+      tcpEstablishedTimeout: 1h0m0s
 
 apiServerCertSANs:
 - localhost
