@@ -65,6 +65,10 @@ variable "dns_primary_domain" {
   default = "example.com"
 }
 
+variable "dns_ttl" {
+  default = "300"
+}
+
 variable "bastion" {
   description = "Access to the cluster via SSH bastion instance"
   type        = "map"
