@@ -5,7 +5,7 @@ module "k8s_node" {
   cluster           = "${var.cluster}"
   instance_type     = "r4.large"
   version           = "${var.version}"
-  k8s_version       = "${var.k8s_version}"
+  kube_version       = "${var.k8s_version}"
   master_ip         = "api.test.virginia.pubnative.io"
   k8s_token         = "${var.k8s_token}"
   availability_zone = "us-east-1a"

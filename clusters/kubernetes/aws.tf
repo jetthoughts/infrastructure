@@ -1,5 +1,5 @@
 terraform {
-  required_version = ">= 0.11.2"
+  required_version = ">= 0.11.7"
 }
 
 provider "aws" {
@@ -24,7 +24,7 @@ data "aws_ami" "centos" {
 
 resource "aws_key_pair" "k8s_key" {
   provider   = "aws.virginia"
-  key_name   = "k8s-key"
+  key_name   = "k8s-key-test"
   public_key = "${var.public_key}"
 
   lifecycle {

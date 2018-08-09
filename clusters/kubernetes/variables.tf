@@ -3,7 +3,7 @@ variable "cluster" {
 }
 
 variable "masters_count" {
-  default = "3"
+  default = "1"
 }
 
 variable "master_ips" {
@@ -47,7 +47,7 @@ variable "google_oauth_client_id" {}
 variable "k8s_token" {}
 
 variable "k8s_version" {
-  default = "v1.8.3"
+  default = "v1.11.2"
 }
 
 variable "etcd_endpoints" {

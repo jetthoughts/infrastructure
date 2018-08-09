@@ -17,7 +17,7 @@ variable "k8s_token" {
 }
 
 variable "kube_version" {
-  default = "v1.11.0"
+  default = "v1.11.2"
 }
 
 variable "k8s_pod_network_cidr" {
