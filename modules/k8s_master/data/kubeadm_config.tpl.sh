@@ -31,6 +31,8 @@ featureGates:
   CoreDNS: true
 
 controllerManagerExtraArgs:
+  # DEPRECATED: Would be removed in next version
+  cloud-provider: "aws"
   horizontal-pod-autoscaler-use-rest-clients: "false"
 
 networking:
