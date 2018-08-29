@@ -75,7 +75,7 @@ resource "aws_launch_configuration" "node" {
 
   root_block_device = {
     volume_type           = "standard"
-    volume_size           = 20
+    volume_size           = "${var.root_volume_size}"
     delete_on_termination = true
     iops                  = 0
   }

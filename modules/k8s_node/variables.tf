@@ -86,3 +86,8 @@ variable "kube_node_taints" {
   description = "List of taints to apply to this group of nodes"
   default     = []
 }
+
+variable "root_volume_size" {
+  description = "Set root volume disk size"
+  default = "20"
+}
