@@ -31,5 +31,5 @@ variable "cert_sans" {
 
 variable "kube_version" {
   description = "The version of kubeadm to use"
-  default     = "v1.11.0-alpha.2"
+  default     = "v1.11.2"
 }
