@@ -34,6 +34,7 @@ controllerManagerExtraArgs:
   # DEPRECATED: Would be removed in next version
   cloud-provider: "aws"
   horizontal-pod-autoscaler-use-rest-clients: "false"
+  horizontal-pod-autoscaler-downscale-delay: "15m0s"
 
 networking:
   podSubnet: ${k8s_pod_network_cidr}
