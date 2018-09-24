@@ -5,6 +5,8 @@ set -x
 # -e Exit immediately if a command exits with a non-zero status.
 set -e
 
+systemctl start docker
+
 # Exit if the packages already are preinstalled via image
 which kubeadm && exit 0
 

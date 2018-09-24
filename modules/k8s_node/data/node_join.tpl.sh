@@ -9,11 +9,14 @@ export PRIVATE_HOSTNAME=$(curl http://instance-data/latest/meta-data/hostname)
 
 sysctl kernel.hostname=$PRIVATE_HOSTNAME
 
-for i in `seq 5 1`
+for i in {1..100}
 do
-  sleep $[ $i * 10 ]
   docker ps && break || true
+  sleep $i
 done
+
+# TODO: Send notification if it failed to node join
+docker ps
 
 docker pull gcr.io/google_containers/kube-proxy-amd64:${kube_version} || true
 
