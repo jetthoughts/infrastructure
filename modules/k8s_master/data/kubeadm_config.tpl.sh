@@ -51,7 +51,7 @@ kubeProxy:
     mode: ipvs
     conntrack:
       max: null
-      maxPerCore: 65536
+      maxPerCore: 1048576
       min: 524288
       tcpCloseWaitTimeout: 0h10m0s
       tcpEstablishedTimeout: 1h0m0s
