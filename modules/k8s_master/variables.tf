@@ -127,3 +127,14 @@ variable "tags" {
     Name = "k8s-master"
   }
 }
+
+variable "kubelet_extra_args" {
+  type        = "list"
+  description = "List of kubelet args"
+
+  default = [
+    "--cloud-provider=aws",
+    "--runtime-cgroups=/systemd/system.slice",
+    "--kubelet-cgroups=/systemd/system.slice",
+  ]
+}

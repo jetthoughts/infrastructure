@@ -4,7 +4,7 @@ data "template_file" "node_join" {
   vars {
     kube_version = "${var.kube_version}"
     kube_token   = "${var.k8s_token}"
-    master_ip   = "${var.master_ip}"
+    master_ip    = "${var.master_ip}"
     node_labels  = "${join(" ", var.node_labels)}"
   }
 }
@@ -13,8 +13,9 @@ data "template_file" "kube_args" {
   template = "${file("${path.module}/data/k8s_kubelet_extra_args.tpl.sh")}"
 
   vars {
-    node_labels  = "${join(",", var.node_labels)}"
-    node_taints  = "${join(",", var.kube_node_taints)}"
+    node_labels        = "${join(",", var.node_labels)}"
+    node_taints        = "${join(",", var.kube_node_taints)}"
+    kubelet_extra_args = "${join(" ", var.kubelet_extra_args)}"
   }
 }
 
@@ -101,7 +102,7 @@ resource "aws_autoscaling_group" "node" {
   max_size             = "${var.max_size}"
   launch_configuration = "${aws_launch_configuration.node.name}"
 
-  tags = ["${var.tags}"]
+  tags              = ["${var.tags}"]
   target_group_arns = ["${var.target_group_arns}"]
 }
 

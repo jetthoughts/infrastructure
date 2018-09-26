@@ -78,7 +78,7 @@ variable "target_group_arns" {
 
 variable "pre_init_script" {
   description = "Content to be run before the kubeadm."
-  default = ""
+  default     = ""
 }
 
 variable "kube_node_taints" {
@@ -87,7 +87,18 @@ variable "kube_node_taints" {
   default     = []
 }
 
+variable "kubelet_extra_args" {
+  type        = "list"
+  description = "List of kubelet args"
+
+  default = [
+    "--cloud-provider=aws",
+    "--runtime-cgroups=/systemd/system.slice",
+    "--kubelet-cgroups=/systemd/system.slice",
+  ]
+}
+
 variable "root_volume_size" {
   description = "Set root volume disk size"
-  default = "20"
+  default     = "20"
 }

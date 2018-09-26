@@ -1,8 +1,8 @@
 locals {
-  ec2_tags = "${merge(map("Name", "k8s-${var.name}-master", "KubernetesCluster", "${var.name}", "kubernetes.io/cluster/${var.name}", "true"),var.tags)}"
-  pki_path = "${var.certs_path}/pki/"
-  domain   = "api.${var.name}.${var.datacenter}.${var.dns_primary_domain}"
-  internal_domain   = "internal.${var.name}.${var.datacenter}.${var.dns_primary_domain}"
+  ec2_tags        = "${merge(map("Name", "k8s-${var.name}-master", "KubernetesCluster", "${var.name}", "kubernetes.io/cluster/${var.name}", "true"),var.tags)}"
+  pki_path        = "${var.certs_path}/pki/"
+  domain          = "api.${var.name}.${var.datacenter}.${var.dns_primary_domain}"
+  internal_domain = "internal.${var.name}.${var.datacenter}.${var.dns_primary_domain}"
 }
 
 resource "aws_instance" "masters" {
@@ -69,7 +69,7 @@ resource "aws_instance" "masters" {
   }
 
   provisioner "file" {
-    source      = "${path.module}/data/k8s_kubelet_extra_args.sh"
+    content     = "${data.template_file.kube_args.rendered}"
     destination = "/tmp/terraform/k8s_kubelet_extra_args.sh"
   }
 
@@ -154,5 +154,13 @@ data "template_file" "kube_packages" {
 
   vars {
     kube_version = "${var.kube_version}"
+  }
+}
+
+data "template_file" "kube_args" {
+  template = "${file("${path.module}/data/k8s_kubelet_extra_args.tpl.sh")}"
+
+  vars {
+    kubelet_extra_args = "${join(" ", var.kubelet_extra_args)}"
   }
 }
