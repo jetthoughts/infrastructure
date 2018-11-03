@@ -43,6 +43,10 @@ variable "availability_zone" {
 
 variable "subnet_id" {}
 
+variable "remote_user" {
+  default = "centos"
+}
+
 variable "kube_conf_remote_path" {
   default = "/home/centos/"
 }
@@ -75,8 +79,8 @@ variable "bastion" {
 
   default = {
     host        = ""
-    port        = ""
-    user        = ""
+    port        = 0
+    user        = "centos"
     private_key = ""
   }
 }

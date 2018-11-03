@@ -5,6 +5,7 @@ resource "null_resource" "generate_pki" {
 }
 
 resource "null_resource" "extract_admin_key" {
+  depends_on = ["null_resource.generate_pki"]
   provisioner "local-exec" {
     command = "ruby ${path.module}/data/extract_crt.rb -s ${var.certs_path}/admin.conf -d ${var.certs_path}"
   }

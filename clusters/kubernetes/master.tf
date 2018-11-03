@@ -2,9 +2,10 @@ module "k8s_master" {
   providers = {
     aws = "aws.tokyo"
   }
+
   source            = "../../modules/k8s_master"
   name              = "${var.cluster}"
-  cluster_size      = "${var.masters_count}"
+  cluster_size      = "${length(var.master_ips)}"
   instance_type     = "c5.large"
   spot_price        = "0.1"
   availability_zone = "${aws_subnet.public_1a.availability_zone}"
@@ -25,11 +26,12 @@ module "k8s_master" {
   dns_primary_domain = "${var.domain}"
 
   # bastion          = "${var.bastion}"
-  asset_path       = "./assets"
-  ssh_key_name     = "${aws_key_pair.k8s.key_name}"
-  admin_email      = "${var.admin_email}"
+  asset_path   = "./assets"
+  ssh_key_name = "${aws_key_pair.k8s.key_name}"
+  admin_email  = "${var.admin_email}"
+
   # etcd_endpoints   = "${var.etcd_endpoints}"
   certs_path       = "${path.module}/data/v113"
   master_addresses = "${var.master_ips}"
-  datacenter = "tokyo"
+  datacenter       = "tokyo"
 }

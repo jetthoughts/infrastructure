@@ -16,12 +16,10 @@
 #   spot_price        = "0.1"
 #   min_size          = "2"
 #   max_size          = "2"
-
 #   node_labels = [
 #     "beta.kubernetes.io/instance-lifecycle=spot",
 #     "role=general",
 #   ]
-
 #   tags = [
 #     {
 #       key                 = "k8s.io/cluster-autoscaler/enabled"
@@ -35,3 +33,4 @@
 #     },
 #   ]
 # }
+
