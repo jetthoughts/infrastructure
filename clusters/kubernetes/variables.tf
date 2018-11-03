@@ -10,9 +10,7 @@ variable "master_ips" {
   type = "list"
 
   default = [
-    "10.0.1.11",
-    "10.0.1.12",
-    "10.0.1.13",
+    "10.0.2.3",
   ]
 }
 
@@ -20,34 +18,15 @@ variable "admin_email" {
   default = "amdin@example.com"
 }
 
-variable "public_key" {}
-
-// Required AWS resources
-variable "vpc_id" {}
-
-variable "subnet_id" {}
-
-variable "bastion" {
-  type = "map"
-
-  default = {
-    host        = "8.8.8.8"
-    private_ip  = "10.0.0.1"
-    port        = "22"
-    user        = "bastion"
-    private_key = "~/.ssh/id_rsa"
-  }
-}
-
 variable "version" {
-  default = "v20171113"
+  default = "v20181102"
 }
 
 variable "google_oauth_client_id" {}
 variable "k8s_token" {}
 
 variable "k8s_version" {
-  default = "v1.11.2"
+  default = "v1.13.0-alpha.3"
 }
 
 variable "etcd_endpoints" {
@@ -58,6 +37,7 @@ variable "etcd_endpoints" {
 
 variable "ami_id" {
   description = "Existing base image for K8S cluster."
+  default     = ""
 }
 
 variable "domain" {
@@ -67,4 +47,5 @@ variable "domain" {
 
 variable "dns_zone_id" {
   description = "Route53 zone id"
+  default     = ""
 }

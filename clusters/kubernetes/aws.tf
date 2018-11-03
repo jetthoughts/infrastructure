@@ -1,18 +1,20 @@
 terraform {
-  required_version = ">= 0.11.7"
+  required_version = ">= 0.11.10"
 }
 
 provider "aws" {
-  region = "us-east-1"
+  version = ">= 1.42"
+  region  = "ap-northeast-1"
 }
 
 provider "aws" {
-  alias  = "virginia"
-  region = "us-east-1"
+  alias   = "tokyo"
+  version = ">= 1.42"
+  region  = "ap-northeast-1"
 }
 
 data "aws_ami" "centos" {
-  provider    = "aws.virginia"
+  provider    = "aws.tokyo"
   most_recent = true
   owners      = ["410186602215"]
 
@@ -22,21 +24,18 @@ data "aws_ami" "centos" {
   }
 }
 
-resource "aws_key_pair" "k8s_key" {
-  provider   = "aws.virginia"
-  key_name   = "k8s-key-test"
-  public_key = "${var.public_key}"
-
-  lifecycle {
-    ignore_changes = []
-  }
+# $ ssh-keygen -f ./data/k8s_rsa -t rsa -b 4098 -C "k8s"
+resource "aws_key_pair" "k8s" {
+  provider   = "aws.tokyo"
+  key_name   = "k8s_rsa"
+  public_key = "${file("./data/k8s_rsa.pub")}"
 }
 
 resource "aws_security_group" "k8s_nodes" {
-  provider    = "aws.virginia"
-  description = "K8s nodes"
-  vpc_id      = "${var.vpc_id}"
-  name        = "k8s-node-${var.cluster}"
+  provider    = "aws.tokyo"
+  description = "K8s nodes. Managed by Terraform."
+  vpc_id      = "${aws_vpc.kubernetes.id}"         # "${var.vpc_id}"
+  name        = "k8s_node_${var.cluster}"
 
   ingress {
     from_port = 22
@@ -45,7 +44,7 @@ resource "aws_security_group" "k8s_nodes" {
     self      = false
 
     cidr_blocks = [
-      "${var.bastion["private_ip"]}/32",
+      "0.0.0.0/0",
     ]
   }
 

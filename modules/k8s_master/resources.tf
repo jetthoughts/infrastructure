@@ -49,7 +49,7 @@ resource "aws_instance" "masters" {
     bastion_host        = "${var.bastion["host"]}"
     bastion_user        = "${var.bastion["user"]}"
     bastion_port        = "${var.bastion["port"]}"
-    bastion_private_key = "${file(var.bastion["private_key"])}"
+    bastion_private_key = "${var.bastion["private_key"]}"
   }
 
   provisioner "remote-exec" {
