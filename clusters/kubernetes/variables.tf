@@ -2,16 +2,9 @@ variable "cluster" {
   default = "test"
 }
 
-variable "masters_count" {
-  default = "1"
-}
-
 variable "master_ips" {
-  type = "list"
-
-  default = [
-    "10.0.2.3",
-  ]
+  type        = "list"
+  description = "Private ip addresses for future masters."
 }
 
 variable "admin_email" {
@@ -47,5 +40,10 @@ variable "domain" {
 
 variable "dns_zone_id" {
   description = "Route53 zone id"
+  default     = ""
+}
+
+variable "vpc_id" {
+  description = "Create cluster in existing vpc."
   default     = ""
 }

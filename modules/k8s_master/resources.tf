@@ -1,5 +1,5 @@
 locals {
-  ec2_tags        = "${merge(map("Name", "k8s-${var.name}-master", "KubernetesCluster", "${var.name}", "kubernetes.io/cluster/${var.name}", "true"),var.tags)}"
+  ec2_tags        = "${merge(map("Name", "k8s_${var.name}_master", "KubernetesCluster", "${var.name}", "kubernetes.io/cluster/${var.name}", "true"),var.tags)}"
   pki_path        = "${var.certs_path}/pki/"
   domain          = "api.${var.name}.${var.datacenter}.${var.dns_primary_domain}"
   internal_domain = "internal.${var.name}.${var.datacenter}.${var.dns_primary_domain}"
@@ -29,7 +29,7 @@ resource "aws_instance" "masters" {
   availability_zone       = "${var.availability_zone}"
   subnet_id               = "${var.subnet_id}"
   private_ip              = "${element(var.master_addresses, count.index)}"
-  disable_api_termination = true
+  disable_api_termination = false
 
   root_block_device = {
     volume_type           = "standard"
@@ -40,11 +40,15 @@ resource "aws_instance" "masters" {
 
   tags        = "${local.ec2_tags}"
   volume_tags = "${local.ec2_tags}"
+}
 
-  ////  Provision
+
+resource "null_resource" "bootstrap_bastion" {
+  count = "${var.bastion["host"] == "" ? 0 : var.cluster_size}"
+
   connection {
-    host                = "${self.private_ip}"
-    user                = "centos"
+    host                = "${element(aws_instance.masters.*.private_ip, count.index)}"
+    user                = "${var.remote_user}"
     private_key         = "${file("${var.asset_path}/${var.ssh_key_name}")}"
     bastion_host        = "${var.bastion["host"]}"
     bastion_user        = "${var.bastion["user"]}"
@@ -123,6 +127,82 @@ EOF
     ]
   }
 }
+
+resource "null_resource" "bootstrap_public" {
+  count = "${var.bastion["host"] == "" ? var.cluster_size : 0}"
+
+  connection {
+    host                = "${element(aws_instance.masters.*.public_ip, count.index)}"
+    user                = "${var.remote_user}"
+    private_key         = "${file("${var.asset_path}/${var.ssh_key_name}")}"
+  }
+
+  provisioner "remote-exec" {
+    inline = [
+      "mkdir -p /tmp/terraform/pki",
+    ]
+  }
+
+  provisioner "file" {
+    source      = "${path.module}/data/packages.sh"
+    destination = "/tmp/terraform/packages.sh"
+  }
+
+  provisioner "file" {
+    content     = "${data.template_file.kube_packages.rendered}"
+    destination = "/tmp/terraform/kube_packages.sh"
+  }
+
+  provisioner "file" {
+    content     = "${data.template_file.kube_args.rendered}"
+    destination = "/tmp/terraform/k8s_kubelet_extra_args.sh"
+  }
+
+  provisioner "file" {
+    source      = "${path.module}/data/certificates.sh"
+    destination = "/tmp/terraform/certificates.sh"
+  }
+
+  provisioner "file" {
+    source      = "${local.pki_path}/"
+    destination = "/tmp/terraform/pki"
+  }
+
+  provisioner "file" {
+    content     = "${data.template_file.kubeadm_config.rendered}"
+    destination = "/tmp/terraform/kubeadm_config.sh"
+  }
+
+  provisioner "file" {
+    content     = "${data.template_file.master_user_data.rendered}"
+    destination = "/tmp/terraform/master.sh"
+  }
+
+  provisioner "file" {
+    content = <<EOF
+set -x
+kubectl --kubeconfig=/etc/kubernetes/admin.conf create clusterrolebinding cluster-admin-${var.admin_email} --clusterrole=cluster-admin --user=${var.admin_email} || true
+kubectl --kubeconfig=/etc/kubernetes/admin.conf create clusterrolebinding admin-${var.admin_email} --clusterrole=admin --user=${var.admin_email} || true
+EOF
+
+    destination = "/tmp/terraform/admin.sh"
+  }
+
+  provisioner "remote-exec" {
+    inline = [
+      "chmod +x /tmp/terraform/*.sh",
+      "sudo /tmp/terraform/packages.sh",
+      "sudo /tmp/terraform/kube_packages.sh",
+      "sudo /tmp/terraform/k8s_kubelet_extra_args.sh",
+      "sudo /tmp/terraform/certificates.sh",
+      "sudo /tmp/terraform/kubeadm_config.sh",
+      "sudo /tmp/terraform/master.sh",
+      "sudo sh /tmp/terraform/admin.sh",
+      "sudo shutdown -r +1",
+    ]
+  }
+}
+
 
 data "template_file" "master_user_data" {
   template = "${file("${path.module}/data/master_init.tpl.sh")}"
