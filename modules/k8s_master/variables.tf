@@ -21,7 +21,7 @@ variable "kube_version" {
 }
 
 variable "pod_network_cidr" {
-  default = "10.244.0.0/16"
+  default = "192.168.0.0/16"
 }
 
 variable "service_network_cidr" {
