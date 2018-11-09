@@ -5,6 +5,7 @@ module "k8s_master" {
 
   source            = "../../modules/k8s_master"
   name              = "${var.cluster}"
+  datacenter        = "tokyo"
   cluster_size      = "${length(var.master_ips)}"
   instance_type     = "c5.large"
   spot_price        = "0.1"
@@ -31,9 +32,9 @@ module "k8s_master" {
   admin_email  = "${var.admin_email}"
 
   # etcd_endpoints   = "${var.etcd_endpoints}"
-  certs_path       = "${path.module}/data/v113"
+  certs_path       = "${path.module}/assets/v113"
   master_addresses = "${var.master_ips}"
-  datacenter       = "tokyo"
+
 
   # Canal
   # pod_network_cidr = "10.244.0.0/16"

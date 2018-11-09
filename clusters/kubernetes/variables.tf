@@ -12,7 +12,7 @@ variable "admin_email" {
 }
 
 variable "version" {
-  default = "v20181102"
+  default = "v20181109"
 }
 
 variable "google_oauth_client_id" {}
