@@ -109,29 +109,29 @@ resource "aws_security_group" "k8s_nodes" {
     self      = true
   }
 
-  //  cadvisor port
-  ingress {
-    from_port = 4194
-    to_port   = 4194
-    protocol  = "tcp"
-    self      = true
-  }
+  # //  cadvisor port
+  # ingress {
+  #   from_port = 4194
+  #   to_port   = 4194
+  #   protocol  = "tcp"
+  #   self      = true
+  # }
 
-  //  canal-etcd
-  ingress {
-    from_port = 6666
-    to_port   = 6666
-    protocol  = "tcp"
-    self      = true
-  }
+  # //  canal-etcd
+  # ingress {
+  #   from_port = 6666
+  #   to_port   = 6666
+  #   protocol  = "tcp"
+  #   self      = true
+  # }
 
-  //  flannel
-  ingress {
-    from_port = 8472
-    to_port   = 8472
-    protocol  = "udp"
-    self      = true
-  }
+  # //  flannel
+  # ingress {
+  #   from_port = 8472
+  #   to_port   = 8472
+  #   protocol  = "udp"
+  #   self      = true
+  # }
 
   egress {
     from_port = 0
@@ -146,7 +146,7 @@ resource "aws_security_group" "k8s_nodes" {
 
   tags {
     Name      = "k8s-node-${var.cluster}"
-    Cluster   = "k8s"
+    Cluster   = "${var.cluster}"
     Version   = "${var.version}"
     Terraform = "true"
   }
