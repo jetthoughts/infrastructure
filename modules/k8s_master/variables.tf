@@ -12,7 +12,7 @@ variable "asset_path" {
   default     = "./assets"
 }
 
-variable "k8s_token" {
+variable "bootstrap_token" {
   description = "Kubeadm token. Generate a new token: `kubeadm token`"
 }
 
@@ -20,8 +20,12 @@ variable "kube_version" {
   default = "v1.11.2"
 }
 
-variable "k8s_pod_network_cidr" {
-  default = "10.244.0.0/16"
+variable "pod_network_cidr" {
+  default = "192.168.0.0/16"
+}
+
+variable "service_network_cidr" {
+  default = "10.96.0.0/12"
 }
 
 variable "k8s_ca_crt" {
@@ -42,6 +46,10 @@ variable "availability_zone" {
 }
 
 variable "subnet_id" {}
+
+variable "remote_user" {
+  default = "centos"
+}
 
 variable "kube_conf_remote_path" {
   default = "/home/centos/"
@@ -75,8 +83,8 @@ variable "bastion" {
 
   default = {
     host        = ""
-    port        = ""
-    user        = ""
+    port        = 0
+    user        = "centos"
     private_key = ""
   }
 }
@@ -137,4 +145,17 @@ variable "kubelet_extra_args" {
     "--runtime-cgroups=/systemd/system.slice",
     "--kubelet-cgroups=/systemd/system.slice",
   ]
+}
+
+variable "pre_init_script" {
+  default = <<EOF
+    echo "Pre init script:"
+  EOF
+}
+
+variable "cni_install_script" {
+  default = <<EOF
+kubectl apply -f https://docs.projectcalico.org/v3.3/getting-started/kubernetes/installation/hosted/rbac-kdd.yaml
+kubectl apply -f https://docs.projectcalico.org/v3.3/getting-started/kubernetes/installation/hosted/kubernetes-datastore/calico-networking/1.7/calico.yaml
+  EOF
 }
