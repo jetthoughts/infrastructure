@@ -1,44 +1,108 @@
-#!/bin/bash -xe
+#!/bin/bash -xeu
 
-set -e
-set -x
+echo "kubeadm_config.tpl.sh"
+# kubeadm init --pod-network-cidr=192.168.0.0/16 --kubernetes-version=1.13.0-alpha.3
 
-export PRIVATE_IP=$(curl http://instance-data/latest/meta-data/local-ipv4)
-export PRIVATE_HOSTNAME=$(curl http://instance-data/latest/meta-data/hostname)
+set -euo pipefail
 
-sysctl kernel.hostname=$PRIVATE_HOSTNAME
+export PRIVATE_IP=$(curl -s http://169.254.169.254/latest/meta-data/local-ipv4)
+export PRIVATE_HOSTNAME=$(curl -s http://169.254.169.254/latest/meta-data/hostname)
 
 KUBEADM_CONFIG="/etc/kubernetes/kubeadm.yml"
 
+# https://godoc.org/k8s.io/kubernetes/cmd/kubeadm/app/apis/kubeadm/v1alpha3
 cat <<EOF > $KUBEADM_CONFIG
-apiVersion: kubeadm.k8s.io/v1alpha1
-kind: MasterConfiguration
-api:
-  controlPlaneEndpoint: ${domain}
+---
+apiVersion: kubeadm.k8s.io/v1beta1
+kind: InitConfiguration
+
+bootstrapTokens:
+  - token: ${bootstrap_token}
+    description: "node join token"
+    ttl: "0h0m0s"
+nodeRegistration:
+  name: $PRIVATE_HOSTNAME
+  # apiEndpoint:
+  #   advertiseAddress: "$PRIVATE_IP"
+  #   bindPort: 6443
+# ---
+# # https://godoc.org/k8s.io/kubelet/config/v1beta1#KubeletConfiguration
+# apiVersion: kubelet.config.k8s.io/v1beta1
+# kind: KubeletConfiguration
+# evictionHard:
+#     memory.available:  "300Mi"
+# cloudProvider: aws
+# cgroupDriver: systemd
+# runtimeCgroups: /systemd/system.slice
+# kubeletCgroups: /systemd/system.slice
+
+---
+
+apiVersion: kubeadm.k8s.io/v1beta1
+kind: ClusterConfiguration
+# clusterName: "${name}"
+networking:
+  # serviceSubnet: "${service_network_cidr}"
+  podSubnet: "${pod_network_cidr}"
 kubernetesVersion: ${kube_version}
-nodeName: $PRIVATE_HOSTNAME
-token: ${k8s_token}
-tokenTTL: 0h0m0s
+#controlPlaneEndpoint: "$PRIVATE_IP:6443"
+#controlPlaneEndpoint: ${internal_domain}
 apiServerExtraArgs:
+  # authorization-mode: "Node,RBAC"
   apiserver-count: "${cluster_size}"
-  runtime-config: "api/all=true,batch/v1beta1=true"
+  # runtime-config: "api/all=true,batch/v1beta1=true"
   oidc-issuer-url: "https://accounts.google.com"
   oidc-username-claim: email
   oidc-client-id: ${google_oauth_client_id}
   etcd-prefix: "${etcd_prefix}"
+  # cloud-provider: aws
 
-featureGates:
-  CoreDNS: true
+# featureGates:
+#   CoreDNS: true
+#   DynamicKubeletConfig: true
 
+apiServerCertSANs:
+  - localhost
+  - 127.0.0.1
+  - 10.96.0.1
+  - $PRIVATE_IP
+  - $PRIVATE_HOSTNAME
+  - ${domain}
+  - ${internal_domain}
+EOF
+
+MASTER_IPS="${master_ips}"
+if [ "$MASTER_IPS" != "" ]; then
+  for ipaddress in $MASTER_IPS
+  do
+    echo "  - $ipaddress" >> $KUBEADM_CONFIG
+  done
+fi
+
+ETCD_ENDPOINTS="${etcd_endpoints}"
+if [ "$ETCD_ENDPOINTS" != "" ]; then
+  cat <<EOF >> $KUBEADM_CONFIG
+etcd:
+  external:
+    endpoints:
+EOF
+
+  for endpoint in $ETCD_ENDPOINTS
+  do
+    echo "    - $endpoint" >> $KUBEADM_CONFIG
+  done
+fi
+
+sync
+
+cat <<EOF
+---
 controllerManagerExtraArgs:
   # DEPRECATED: Would be removed in next version
   cloud-provider: "aws"
   configure-cloud-routes: "false"
   horizontal-pod-autoscaler-use-rest-clients: "false"
   horizontal-pod-autoscaler-downscale-delay: "15m0s"
-
-networking:
-  podSubnet: ${k8s_pod_network_cidr}
 
 kubeletConfiguration:
   baseConfig:
@@ -57,34 +121,4 @@ kubeProxy:
       tcpCloseWaitTimeout: 0h10m0s
       tcpEstablishedTimeout: 1h0m0s
 
-apiServerCertSANs:
-- localhost
-- 127.0.0.1
-- 10.96.0.1
-- $PRIVATE_IP
-- $PRIVATE_HOSTNAME
-- ${domain}
 EOF
-
-MASTER_IPS="${master_ips}"
-if [ "$MASTER_IPS" != "" ]; then
-  for ipaddress in $MASTER_IPS
-  do
-    echo "- $ipaddress" >> $KUBEADM_CONFIG
-  done
-fi
-
-ETCD_ENDPOINTS="${etcd_endpoints}"
-if [ "$ETCD_ENDPOINTS" != "" ]; then
-  cat <<EOF >> $KUBEADM_CONFIG
-etcd:
-  endpoints:
-EOF
-
-  for endpoint in $ETCD_ENDPOINTS
-  do
-    echo "  - $endpoint" >> $KUBEADM_CONFIG
-  done
-fi
-
-sync

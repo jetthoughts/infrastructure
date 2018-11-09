@@ -1,5 +1,5 @@
 variable "cluster" {
-  default = "test"
+  default = "staging"
 }
 
 variable "master_ips" {
@@ -16,9 +16,9 @@ variable "version" {
 }
 
 variable "google_oauth_client_id" {}
-variable "k8s_token" {}
+variable "bootstrap_token" {}
 
-variable "k8s_version" {
+variable "kube_version" {
   default = "v1.13.0-alpha.3"
 }
 

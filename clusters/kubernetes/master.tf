@@ -17,8 +17,8 @@ module "k8s_master" {
   ]
 
   version                = "${var.version}"
-  kube_version           = "${var.k8s_version}"
-  k8s_token              = "${var.k8s_token}"
+  kube_version           = "${var.kube_version}"
+  bootstrap_token        = "${var.bootstrap_token}"
   google_oauth_client_id = "${var.google_oauth_client_id}"
 
   // Don't create Route53 records if it is empty
@@ -34,4 +34,18 @@ module "k8s_master" {
   certs_path       = "${path.module}/data/v113"
   master_addresses = "${var.master_ips}"
   datacenter       = "tokyo"
+
+  # Canal
+  # pod_network_cidr = "10.244.0.0/16"
+  # cni_install_script = <<EOF
+  #   kubectl apply -f https://docs.projectcalico.org/v3.3/getting-started/kubernetes/installation/hosted/canal/rbac.yaml
+  #   kubectl apply -f https://docs.projectcalico.org/v3.3/getting-started/kubernetes/installation/hosted/canal/canal.yaml
+  # EOF
+
+  # Calico
+  pod_network_cidr = "192.168.0.0/16"
+  cni_install_script = <<EOF
+    kubectl apply -f https://docs.projectcalico.org/v3.3/getting-started/kubernetes/installation/hosted/rbac-kdd.yaml
+    kubectl apply -f https://docs.projectcalico.org/v3.3/getting-started/kubernetes/installation/hosted/kubernetes-datastore/calico-networking/1.7/calico.yaml
+  EOF
 }
