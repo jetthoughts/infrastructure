@@ -1,0 +1,22 @@
+#!/bin/sh
+
+set -e
+set -x
+
+for i in $(git diff --name-only | grep -v partials | grep -e 'images/.*\.json')
+do
+  packer validate $i
+done
+
+for i in $(git diff --name-only | grep -e '.*\.tf$')
+do
+  terraform fmt $i
+done
+
+current_dir=$(PWD)
+for i in $(git diff --name-only | grep -e '.*\.tf$' | grep -v '^modules/')
+do
+  cd $(dirname $i)
+  terraform validate .
+  cd $current_dir
+done

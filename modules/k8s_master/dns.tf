@@ -4,7 +4,7 @@ resource "aws_route53_record" "api" {
   name    = "${local.domain}"
   type    = "A"
   ttl     = "${var.dns_ttl}"
-  records = "${var.master_addresses}"
+  records = ["${aws_instance.masters.public_ip}"]
 }
 
 resource "aws_route53_record" "internal" {

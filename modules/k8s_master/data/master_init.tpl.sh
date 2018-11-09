@@ -1,13 +1,13 @@
-#!/bin/bash -x
+#!/bin/bash -eu
 
-set -e
+set -euo pipefail
 
 # https://coreos.com/os/docs/latest/cluster-discovery.html
 
-export PRIVATE_IP=$(curl http://instance-data/latest/meta-data/local-ipv4)
-export PRIVATE_HOSTNAME=$(curl http://instance-data/latest/meta-data/hostname)
+export PRIVATE_IP=$(curl -s http://169.254.169.254/latest/meta-data/local-ipv4)
+export PRIVATE_HOSTNAME=$(curl -s http://169.254.169.254/latest/meta-data/hostname)
 
-sysctl kernel.hostname=$PRIVATE_HOSTNAME
+sysctl -w kernel.hostname=$PRIVATE_HOSTNAME
 
 for i in `seq 5 1`
 do
@@ -15,16 +15,19 @@ do
   docker ps && break || true
 done
 
-docker pull gcr.io/google_containers/kube-apiserver-amd64:${k8s_version} || true
-docker pull gcr.io/google_containers/kube-controller-manager-amd64:${k8s_version} || true
-docker pull gcr.io/google_containers/kube-scheduler-amd64:${k8s_version} || true
-docker pull gcr.io/google_containers/kube-proxy-amd64:${k8s_version} || true
+docker pull k8s.gcr.io/pause:3.1 || true
+docker pull k8s.gcr.io/etcd:3.2.24 || true
+docker pull k8s.gcr.io/coredns:1.2.4 || true
+docker pull k8s.gcr.io/kube-scheduler:${kube_version} || true
+docker pull k8s.gcr.io/kube-controller-manager:${kube_version} || true
+docker pull k8s.gcr.io/kube-apiserver:${kube_version} || true
+docker pull k8s.gcr.io/kube-proxy:${kube_version} || true
 
 kubeadm init --config /etc/kubernetes/kubeadm.yml
 
 # Allow other masters to join
 # https://github.com/cookeem/kubeadm-ha#kubeadm-init
-sed -i "s/,NodeRestriction//" /etc/kubernetes/manifests/kube-apiserver.yaml
+# sed -i "s/,NodeRestriction//" /etc/kubernetes/manifests/kube-apiserver.yaml
 
 sleep 10
 
@@ -33,12 +36,5 @@ while ! curl --silent -f -k https://${domain}:6443/healthz > /dev/null; do
   sleep 5;
   echo -n '.';
 done;
-echo 'ready!'
-
-export KUBECONFIG=/etc/kubernetes/admin.conf
-kubectl apply -f https://docs.projectcalico.org/v2.6/getting-started/kubernetes/installation/hosted/canal/rbac.yaml
-kubectl apply -f https://docs.projectcalico.org/v2.6/getting-started/kubernetes/installation/hosted/canal/canal.yaml
-
-kubectl get componentstatuses
 
 sync

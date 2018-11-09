@@ -3,6 +3,7 @@ resource "aws_vpc" "kubernetes" {
   provider                         = "aws.tokyo"
   cidr_block                       = "10.0.2.0/23"
   assign_generated_ipv6_cidr_block = true
+  enable_dns_hostnames             = true
 
   lifecycle {
     prevent_destroy = true
@@ -19,7 +20,7 @@ resource "aws_internet_gateway" "main" {
   vpc_id = "${aws_vpc.kubernetes.id}"
 
   tags {
-    Name = "main"
+    Name      = "main"
     Terraform = "true"
   }
 }
@@ -29,7 +30,7 @@ resource "aws_route_table" "public" {
   vpc_id = "${aws_vpc.kubernetes.id}"
 
   tags {
-    Name = "public"
+    Name      = "public"
     Terraform = "true"
   }
 }
@@ -92,13 +93,18 @@ resource "aws_security_group" "k8s_nodes" {
     to_port   = 6443
     protocol  = "tcp"
     self      = true
+
+    cidr_blocks = [
+      "0.0.0.0/0",
+    ]
+
   }
 
   // https://kubernetes.io/docs/admin/kubelet/
   // https://kubernetes.io/docs/setup/independent/install-kubeadm/
   ingress {
     from_port = 10250
-    to_port   = 10255
+    to_port   = 10257
     protocol  = "tcp"
     self      = true
   }
