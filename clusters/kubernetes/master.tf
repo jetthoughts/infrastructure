@@ -35,7 +35,6 @@ module "k8s_master" {
   certs_path       = "${path.module}/assets/v113"
   master_addresses = "${var.master_ips}"
 
-
   # Canal
   # pod_network_cidr = "10.244.0.0/16"
   # cni_install_script = <<EOF

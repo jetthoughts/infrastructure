@@ -3,7 +3,7 @@ data "template_file" "node_join" {
 
   vars {
     kube_version = "${var.kube_version}"
-    kube_token   = "${var.k8s_token}"
+    bootstrap_token   = "${var.bootstrap_token}"
     master_ip    = "${var.master_ip}"
     node_labels  = "${join(" ", var.node_labels)}"
   }
