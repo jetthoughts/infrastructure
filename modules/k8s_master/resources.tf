@@ -93,7 +93,7 @@ EOF
       "sudo /tmp/terraform/kubeadm_config.sh",
       "sudo /tmp/terraform/master.sh",
       "sudo sh /tmp/terraform/admin.sh",
-      "sudo reboot",
+      "sudo shutdown -r +1",
     ]
   }
 }
