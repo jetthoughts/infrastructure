@@ -97,7 +97,6 @@ resource "aws_security_group" "k8s_nodes" {
     cidr_blocks = [
       "0.0.0.0/0",
     ]
-
   }
 
   // https://kubernetes.io/docs/admin/kubelet/
@@ -117,6 +116,7 @@ resource "aws_security_group" "k8s_nodes" {
   #   self      = true
   # }
 
+
   # //  canal-etcd
   # ingress {
   #   from_port = 6666
@@ -124,6 +124,7 @@ resource "aws_security_group" "k8s_nodes" {
   #   protocol  = "tcp"
   #   self      = true
   # }
+
 
   # //  flannel
   # ingress {
@@ -143,7 +144,6 @@ resource "aws_security_group" "k8s_nodes" {
       "0.0.0.0/0",
     ]
   }
-
   tags {
     Name      = "k8s-node-${var.cluster}"
     Cluster   = "${var.cluster}"

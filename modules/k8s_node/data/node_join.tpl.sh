@@ -21,7 +21,7 @@ docker ps
 
 docker pull gcr.io/google_containers/kube-proxy-amd64:${kube_version} || true
 
-kubeadm join --token="${kube_token}" ${master_ip}:6443 --node-name="$PRIVATE_HOSTNAME" --discovery-token-unsafe-skip-ca-verification --ignore-preflight-errors=SystemVerification
+kubeadm join --token="${bootstrap_token}" ${master_ip}:6443 --node-name="$PRIVATE_HOSTNAME" --discovery-token-unsafe-skip-ca-verification
 
 export KUBELET_PATH="/etc/kubernetes/kubelet.conf"
 

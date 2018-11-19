@@ -2,12 +2,8 @@ variable "name" {
   default = "staging"
 }
 
-variable "cluster" {
-  default = "staging"
-}
-
 variable "kube_version" {
-  default = "v1.11.0"
+  default = "v1.11.2"
 }
 
 variable "node_labels" {
@@ -28,7 +24,7 @@ variable "master_ip" {
 variable "image_id" {}
 
 variable "instance_type" {
-  default = "r4.large"
+  default = "t2.small"
 }
 
 variable "ebs_optimized" {
@@ -41,7 +37,7 @@ variable "security_groups" {
   type = "list"
 }
 
-variable "k8s_token" {
+variable "bootstrap_token" {
   description = "Kubeadm token. Generate a new token: `kubeadm token`"
 }
 
@@ -62,7 +58,7 @@ variable "max_size" {
 
 variable "tags" {
   type        = "list"
-  description = "Autoscaling tags"
+  description = "AutoScaling tags"
 
   default = [
     {

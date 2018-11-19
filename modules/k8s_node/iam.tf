@@ -3,13 +3,13 @@
 resource "aws_iam_instance_profile" "nodes" {
   name = "k8s-nodes-${var.name}"
   role = "${aws_iam_role.nodes.name}"
-  path = "/k8s/"
+  path = "/k8s/${var.name}/"
 }
 
 resource "aws_iam_role" "nodes" {
   name               = "k8s-nodes-${var.name}"
   assume_role_policy = "${file("${path.module}/data/aws_iam_role_policy")}"
-  path               = "/k8s/"
+  path               = "/k8s/${var.name}/"
 }
 
 resource "aws_iam_role_policy" "nodes" {
