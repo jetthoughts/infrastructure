@@ -33,6 +33,7 @@ featureGates:
 controllerManagerExtraArgs:
   # DEPRECATED: Would be removed in next version
   cloud-provider: "aws"
+  configure-cloud-routes: "false"
   horizontal-pod-autoscaler-use-rest-clients: "false"
   horizontal-pod-autoscaler-downscale-delay: "15m0s"
 

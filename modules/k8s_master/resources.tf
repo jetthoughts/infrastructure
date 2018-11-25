@@ -59,6 +59,11 @@ resource "aws_instance" "masters" {
   }
 
   provisioner "file" {
+    content     = "${var.pre_init_script}"
+    destination = "/tmp/terraform/00pre_init_script.sh"
+  }
+
+  provisioner "file" {
     source      = "${path.module}/data/packages.sh"
     destination = "/tmp/terraform/packages.sh"
   }
@@ -106,6 +111,7 @@ EOF
   provisioner "remote-exec" {
     inline = [
       "chmod +x /tmp/terraform/*.sh",
+      "sudo /tmp/terraform/00pre_init_script.sh",
       "sudo /tmp/terraform/packages.sh",
       "sudo /tmp/terraform/kube_packages.sh",
       "sudo /tmp/terraform/k8s_kubelet_extra_args.sh",

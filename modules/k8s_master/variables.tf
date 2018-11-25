@@ -138,3 +138,8 @@ variable "kubelet_extra_args" {
     "--kubelet-cgroups=/systemd/system.slice",
   ]
 }
+
+variable "pre_init_script" {
+  description = "Content to be run before the kubeadm."
+  default     = ""
+}
