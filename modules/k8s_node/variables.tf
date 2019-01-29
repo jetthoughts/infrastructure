@@ -31,6 +31,10 @@ variable "instance_type" {
   default = "r4.large"
 }
 
+variable "ebs_optimized" {
+  default = false
+}
+
 variable "ssh_key_name" {}
 
 variable "security_groups" {

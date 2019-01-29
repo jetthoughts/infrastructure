@@ -69,6 +69,7 @@ resource "aws_launch_configuration" "node" {
   spot_price           = "${var.spot_price}"
   key_name             = "${var.ssh_key_name}"
   iam_instance_profile = "${aws_iam_instance_profile.nodes.id}"
+  ebs_optimized        = "${var.ebs_optimized}"
 
   enable_monitoring = false
 
