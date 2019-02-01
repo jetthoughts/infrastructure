@@ -2,10 +2,6 @@ variable "name" {
   default = "staging"
 }
 
-variable "cluster_size" {
-  default = "1"
-}
-
 variable "asset_path" {
   description = "The path to the kubernetes asset path"
   type        = "string"

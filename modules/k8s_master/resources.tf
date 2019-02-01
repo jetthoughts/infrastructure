@@ -6,7 +6,7 @@ locals {
 }
 
 resource "aws_instance" "masters" {
-  count = "${var.cluster_size}"
+  count = "${length(var.master_addresses)}"
 
   depends_on = [
     "aws_iam_role_policy.masters",
