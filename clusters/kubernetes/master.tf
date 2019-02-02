@@ -1,17 +1,106 @@
+locals {
+  ami_id = "${var.ami_id == "" ? data.aws_ami.centos.image_id : var.ami_id}"
+  availability_zone = "${var.availability_zone == "" ? element(concat(aws_subnet.public_1a.*.availability_zone, list("")), 0) : var.availability_zone}"
+  subnet_id = "${var.subnet_id == "" ? element(concat(aws_subnet.public_1a.*.id, list("")), 0) : var.subnet_id}"
+
+  vpc_id = "${var.vpc_id == "" ? element(concat(aws_vpc.kubernetes.*.id, list("")), 0) : var.vpc_id}"
+}
+
+resource "aws_security_group" "k8s_nodes" {
+  provider    = "aws.virginia"
+  description = "K8s nodes. Managed by Terraform."
+  vpc_id      = "${local.vpc_id}"
+  name        = "k8s_node_${var.cluster}"
+
+  ingress {
+    from_port = 22
+    to_port   = 22
+    protocol  = "tcp"
+    self      = false
+
+    cidr_blocks = [
+      "0.0.0.0/0",
+    ]
+  }
+
+  //  kube-apiserve
+  ingress {
+    from_port = 6443
+    to_port   = 6443
+    protocol  = "tcp"
+    self      = true
+
+    cidr_blocks = [
+      "0.0.0.0/0",
+    ]
+  }
+
+  // https://kubernetes.io/docs/admin/kubelet/
+  // https://kubernetes.io/docs/setup/independent/install-kubeadm/
+  ingress {
+    from_port = 10250
+    to_port   = 10257
+    protocol  = "tcp"
+    self      = true
+  }
+
+  # //  cadvisor port
+  # ingress {
+  #   from_port = 4194
+  #   to_port   = 4194
+  #   protocol  = "tcp"
+  #   self      = true
+  # }
+
+
+  # //  canal-etcd
+  # ingress {
+  #   from_port = 6666
+  #   to_port   = 6666
+  #   protocol  = "tcp"
+  #   self      = true
+  # }
+
+
+  # //  flannel
+  # ingress {
+  #   from_port = 8472
+  #   to_port   = 8472
+  #   protocol  = "udp"
+  #   self      = true
+  # }
+
+  egress {
+    from_port = 0
+    to_port   = 0
+    protocol  = "-1"
+    self      = false
+
+    cidr_blocks = [
+      "0.0.0.0/0",
+    ]
+  }
+  tags {
+    Name      = "k8s-node-${var.cluster}"
+    Cluster   = "${var.cluster}"
+    Version   = "${var.version}"
+    Terraform = "true"
+  }
+}
+
+
 module "k8s_master" {
   providers = {
-    aws = "aws.tokyo"
+    aws = "aws.virginia"
   }
 
   source            = "../../modules/k8s_master"
   name              = "${var.cluster}"
-  datacenter        = "tokyo"
-  cluster_size      = "${length(var.master_ips)}"
   instance_type     = "c5.large"
   spot_price        = "0.1"
-  availability_zone = "${aws_subnet.public_1a.availability_zone}"
-  subnet_id         = "${aws_subnet.public_1a.id}"
-  image_id          = "${var.ami_id == "" ? data.aws_ami.centos.image_id : var.ami_id}"
+  availability_zone = "${local.availability_zone}"
+  subnet_id         = "${local.subnet_id}"
+  image_id          = "${local.ami_id}"
 
   security_groups = [
     "${aws_security_group.k8s_nodes.id}",
@@ -19,7 +108,7 @@ module "k8s_master" {
 
   version                = "${var.version}"
   kube_version           = "${var.kube_version}"
-  bootstrap_token        = "${var.bootstrap_token}"
+  bootstrap_token        = "${var.kubeadm_bootstrap_token}"
   google_oauth_client_id = "${var.google_oauth_client_id}"
 
   // Don't create Route53 records if it is empty
@@ -32,7 +121,7 @@ module "k8s_master" {
   admin_email  = "${var.admin_email}"
 
   # etcd_endpoints   = "${var.etcd_endpoints}"
-  certs_path       = "${path.module}/assets/v113"
+  certs_path       = "${path.module}/assets/v114"
   master_addresses = "${var.master_ips}"
 
   # Canal

@@ -13,7 +13,7 @@ variable "bootstrap_token" {
 }
 
 variable "kube_version" {
-  default = "v1.11.2"
+  default = "v1.14.0-alpha.2"
 }
 
 variable "pod_network_cidr" {
@@ -28,13 +28,8 @@ variable "k8s_ca_crt" {
   default = ""
 }
 
-variable "datacenter" {
-  description = "Datacenter name"
-  default     = "virginia"
-}
-
 variable "instance_type" {
-  default = "r4.large"
+  default = "c5.large"
 }
 
 variable "availability_zone" {
@@ -128,7 +123,7 @@ variable "tags" {
   description = "AWS instance and volume tags"
 
   default = {
-    Name = "k8s-master"
+    Terraform = "true"
   }
 }
 

@@ -1,7 +1,7 @@
 #!/bin/bash -xeu
 
 echo "kubeadm_config.tpl.sh"
-# kubeadm init --pod-network-cidr=192.168.0.0/16 --kubernetes-version=1.13.0-alpha.3
+# kubeadm init --pod-network-cidr=192.168.0.0/16 --kubernetes-version=1.14.0-alpha.2
 
 set -euo pipefail
 

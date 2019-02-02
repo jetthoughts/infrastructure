@@ -1,12 +1,16 @@
 locals {
-  ec2_tags        = "${merge(map("Name", "k8s_${var.name}_master", "KubernetesCluster", "${var.name}", "kubernetes.io/cluster/${var.name}", "true"),var.tags)}"
+  ec2_tags        = "${merge(map("Name", format("k8s-%s-master", var.name), "KubernetesCluster", "${var.name}", "kubernetes.io/cluster/${var.name}", "true"), var.tags)}"
   pki_path        = "${var.certs_path}/pki/"
-  domain          = "api.${var.name}.${var.datacenter}.${var.dns_primary_domain}"
-  internal_domain = "internal.${var.name}.${var.datacenter}.${var.dns_primary_domain}"
+
+  base_domain     = "${var.name}.${var.dns_primary_domain}"
+  domain          = "api.${local.base_domain}"
+  internal_domain = "internal.${local.base_domain}"
+
+  cluster_size    = "${length(var.master_addresses)}"
 }
 
 resource "aws_instance" "masters" {
-  count = "${length(var.master_addresses)}"
+  count = "${local.cluster_size}"
 
   depends_on = [
     "aws_iam_role_policy.masters",
@@ -47,7 +51,7 @@ resource "null_resource" "bootstrap_bastion" {
     "aws_instance.masters"
   ]
 
-  count = "${var.bastion["host"] == "" ? 0 : var.cluster_size}"
+  count = "${var.bastion["host"] == "" ? 0 : local.cluster_size}"
 
   connection {
     host                = "${element(aws_instance.masters.*.private_ip, count.index)}"
@@ -122,19 +126,19 @@ resource "null_resource" "bootstrap_bastion" {
       "sudo /tmp/terraform/00pre_init_script.sh",
       "sudo /tmp/terraform/packages.sh",
       "sudo /tmp/terraform/kube_packages.sh",
-      "sudo /tmp/terraform/k8s_kubelet_extra_args.sh",
+      # "sudo /tmp/terraform/k8s_kubelet_extra_args.sh",
       "sudo /tmp/terraform/certificates.sh",
-      "sudo /tmp/terraform/kubeadm_config.sh",
-      "sudo /tmp/terraform/master.sh",
-      "sudo /tmp/terraform/cni.sh",
-      "sudo /tmp/terraform/admin.sh",
-      "sudo shutdown -r +1",
+  #     "sudo /tmp/terraform/kubeadm_config.sh",
+  #     "sudo /tmp/terraform/master.sh || exit",
+  #     "sudo /tmp/terraform/cni.sh",
+  #     "sudo /tmp/terraform/admin.sh",
+  #     "sudo shutdown -r +1",
     ]
   }
 }
 
 resource "null_resource" "bootstrap_public" {
-  count = "${var.bastion["host"] == "" ? var.cluster_size : 0}"
+  count = "${var.bastion["host"] == "" ? local.cluster_size : 0}"
 
   connection {
     host                = "${element(aws_instance.masters.*.public_ip, count.index)}"
@@ -238,7 +242,7 @@ data "template_file" "kubeadm_config" {
     domain                    = "${local.domain}"
     internal_domain           = "${local.internal_domain}"
     google_oauth_client_id    = "${var.google_oauth_client_id}"
-    cluster_size              = "${var.cluster_size}"
+    cluster_size              = "${local.cluster_size}"
     master_ips                = "\"${join("\" \"", concat(var.master_addresses, var.cert_sans))}\""
     etcd_endpoints            = "\"${join("\" \"", var.etcd_endpoints)}\""
     etcd_prefix               = "${var.etcd_prefix}"

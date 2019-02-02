@@ -5,7 +5,7 @@ Contains sample recipes for DataCenter
 
 ## Provision hosts
 
-Decided to use Maas as host provision tool. 
+Decided to use Maas as host provision tool.
 
 ## Manifesto
 

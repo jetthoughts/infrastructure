@@ -1,20 +1,26 @@
 terraform {
-  required_version = ">= 0.11.10"
+  required_version = ">= 0.11.11"
 }
 
 provider "aws" {
-  version = ">= 1.42"
-  region  = "ap-northeast-1"
+  version = ">= 1.57"
+  region  = "us-east-1"
 }
 
 provider "aws" {
   alias   = "tokyo"
-  version = ">= 1.42"
+  version = ">= 1.57"
   region  = "ap-northeast-1"
 }
 
+provider "aws" {
+  alias   = "virginia"
+  version = ">= 1.53"
+  region  = "us-east-1"
+}
+
 data "aws_ami" "centos" {
-  provider    = "aws.tokyo"
+  provider    = "aws.virginia"
   most_recent = true
   owners      = ["679593333241"]
 
@@ -25,8 +31,9 @@ data "aws_ami" "centos" {
 }
 
 # $ ssh-keygen -f ./assets/k8s_rsa -t rsa -b 4098 -C "k8s"
+# $ cp ./assets/k8s_rsa.pub ./data/
 resource "aws_key_pair" "k8s" {
-  provider   = "aws.tokyo"
+  provider   = "aws.virginia"
   key_name   = "k8s_rsa"
-  public_key = "${file("./assets/k8s_rsa.pub")}"
+  public_key = "${file("./data/k8s_rsa.pub")}"
 }

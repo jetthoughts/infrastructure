@@ -6,10 +6,10 @@ module "k8s_node" {
   version           = "${var.version}"
   kube_version      = "${var.kube_version}"
   master_ip         = "internal.v113.japan.pubnative.io"
-  bootstrap_token   = "${var.bootstrap_token}"
-  availability_zone = "${aws_subnet.public_1a.availability_zone}"
-  subnet_id         = "${aws_subnet.public_1a.id}"
-  image_id          = "${var.ami_id == "" ? data.aws_ami.centos.image_id : var.ami_id}"
+  bootstrap_token   = "${var.kubeadm_bootstrap_token}"
+  availability_zone = "${local.availability_zone}"
+  subnet_id         = "${local.subnet_id}"
+  image_id          = "${local.ami_id}"
 
   security_groups = [
     "${aws_security_group.k8s_nodes.id}",
