@@ -21,9 +21,10 @@ resource "aws_security_group" "k8s_nodes" {
     cidr_blocks = [
       "0.0.0.0/0",
     ]
+
+    description = "ssh: Access to the node. Managed by Terraform."
   }
 
-  //  kube-apiserve
   ingress {
     from_port = 6443
     to_port   = 6443
@@ -33,16 +34,18 @@ resource "aws_security_group" "k8s_nodes" {
     cidr_blocks = [
       "0.0.0.0/0",
     ]
+
+    description = "kube-api-server: Send requests to api server from kubectl. Managed by Terraform."
   }
 
-  // https://kubernetes.io/docs/admin/kubelet/
-  // https://kubernetes.io/docs/setup/independent/install-kubeadm/
-  ingress {
-    from_port = 10250
-    to_port   = 10257
-    protocol  = "tcp"
-    self      = true
-  }
+  # // https://kubernetes.io/docs/admin/kubelet/
+  # // https://kubernetes.io/docs/setup/independent/install-kubeadm/
+  # ingress {
+  #   from_port = 10250
+  #   to_port   = 10257
+  #   protocol  = "tcp"
+  #   self      = true
+  # }
 
   # //  cadvisor port
   # ingress {
@@ -79,9 +82,12 @@ resource "aws_security_group" "k8s_nodes" {
     cidr_blocks = [
       "0.0.0.0/0",
     ]
+
+    description = "Managed by Terraform."
   }
+
   tags {
-    Name      = "k8s-node-${var.cluster}"
+    Name      = "k8s-${var.cluster}-node"
     Cluster   = "${var.cluster}"
     Version   = "${var.version}"
     Terraform = "true"
