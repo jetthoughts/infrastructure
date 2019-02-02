@@ -140,6 +140,10 @@ resource "null_resource" "bootstrap_bastion" {
 resource "null_resource" "bootstrap_public" {
   count = "${var.bastion["host"] == "" ? local.cluster_size : 0}"
 
+  depends_on = [
+    "module.certificates"
+  ]
+
   connection {
     host                = "${element(aws_instance.masters.*.public_ip, count.index)}"
     user                = "${var.remote_user}"

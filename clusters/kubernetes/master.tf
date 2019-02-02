@@ -6,95 +6,6 @@ locals {
   vpc_id = "${var.vpc_id == "" ? element(concat(aws_vpc.kubernetes.*.id, list("")), 0) : var.vpc_id}"
 }
 
-resource "aws_security_group" "k8s_nodes" {
-  provider    = "aws.virginia"
-  description = "K8s nodes. Managed by Terraform."
-  vpc_id      = "${local.vpc_id}"
-  name        = "k8s_node_${var.cluster}"
-
-  ingress {
-    from_port = 22
-    to_port   = 22
-    protocol  = "tcp"
-    self      = false
-
-    cidr_blocks = [
-      "0.0.0.0/0",
-    ]
-
-    description = "ssh: Access to the node. Managed by Terraform."
-  }
-
-  ingress {
-    from_port = 6443
-    to_port   = 6443
-    protocol  = "tcp"
-    self      = true
-
-    cidr_blocks = [
-      "0.0.0.0/0",
-    ]
-
-    description = "kube-api-server: Send requests to api server from kubectl. Managed by Terraform."
-  }
-
-  # // https://kubernetes.io/docs/admin/kubelet/
-  # // https://kubernetes.io/docs/setup/independent/install-kubeadm/
-  # ingress {
-  #   from_port = 10250
-  #   to_port   = 10257
-  #   protocol  = "tcp"
-  #   self      = true
-  # }
-
-  # //  cadvisor port
-  # ingress {
-  #   from_port = 4194
-  #   to_port   = 4194
-  #   protocol  = "tcp"
-  #   self      = true
-  # }
-
-
-  # //  canal-etcd
-  # ingress {
-  #   from_port = 6666
-  #   to_port   = 6666
-  #   protocol  = "tcp"
-  #   self      = true
-  # }
-
-
-  # //  flannel
-  # ingress {
-  #   from_port = 8472
-  #   to_port   = 8472
-  #   protocol  = "udp"
-  #   self      = true
-  # }
-
-  egress {
-    from_port = 0
-    to_port   = 0
-    protocol  = "-1"
-    self      = false
-
-    cidr_blocks = [
-      "0.0.0.0/0",
-    ]
-
-    description = "Managed by Terraform."
-  }
-
-  tags {
-    Name      = "k8s-${var.cluster}-node"
-    Cluster   = "${var.cluster}"
-    Version   = "${var.version}"
-    Terraform = "true"
-  }
-}
-
-
 module "k8s_master" {
   providers = {
     aws = "aws.virginia"
@@ -109,7 +20,8 @@ module "k8s_master" {
   image_id          = "${local.ami_id}"
 
   security_groups = [
-    "${aws_security_group.k8s_nodes.id}",
+    "${aws_security_group.k8s_base.id}",
+    "${aws_security_group.k8s_master.id}",
   ]
 
   version                = "${var.version}"

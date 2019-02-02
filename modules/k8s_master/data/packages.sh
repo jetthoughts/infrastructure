@@ -17,6 +17,10 @@ sudo grub2-mkconfig -o /boot/grub2/grub.cfg
 
 sync
 
+# Docker CE
+
+sudo yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+
 # Kubernetes Provision
 cat <<EOF | sudo tee /etc/yum.repos.d/kubernetes_unstable.repo
 [kubernetes]
@@ -34,7 +38,8 @@ EOF
 sudo setenforce 0 || true
 sudo sed -i -e 's/SELINUX=enforcing/SELINUX=permissive/g' /etc/selinux/config
 
-sudo yum install -y docker kubeadm kubelet kubectl kubernetes-cni cri-tools \
+sudo yum install -y docker-ce docker-ce-cli containerd.io \
+                    kubeadm kubelet kubectl kubernetes-cni cri-tools \
                     ceph-common wget perf wireshark tcpdump httping sysstat \
                     ipvsadm perf tmux vim bind-utils
 

@@ -12,6 +12,18 @@ KUBEADM_CONFIG="/etc/kubernetes/kubeadm.yml"
 
 # https://godoc.org/k8s.io/kubernetes/cmd/kubeadm/app/apis/kubeadm/v1alpha3
 cat <<EOF > $KUBEADM_CONFIG
+
+---
+
+apiVersion: kubeadm.k8s.io/v1beta1
+kind: ClusterConfiguration
+kubernetesVersion: ${kube_version}
+apiServer:
+  certSANs:
+  - ${internal_domain}
+controlPlaneEndpoint: "${internal_domain}:6443"
+
+
 ---
 apiVersion: kubeadm.k8s.io/v1beta1
 kind: InitConfiguration

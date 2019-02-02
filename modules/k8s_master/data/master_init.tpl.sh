@@ -15,15 +15,11 @@ do
   docker ps && break || true
 done
 
-docker pull k8s.gcr.io/pause:3.1 || true
-docker pull k8s.gcr.io/etcd:3.2.24 || true
-docker pull k8s.gcr.io/coredns:1.2.4 || true
-docker pull k8s.gcr.io/kube-scheduler:${kube_version} || true
-docker pull k8s.gcr.io/kube-controller-manager:${kube_version} || true
-docker pull k8s.gcr.io/kube-apiserver:${kube_version} || true
-docker pull k8s.gcr.io/kube-proxy:${kube_version} || true
+kubeadm config images pull
 
 kubeadm init --config /etc/kubernetes/kubeadm.yml --ignore-preflight-errors=SystemVerification
+
+#kubeadm join --token="bootstrap_token" ${domain}:6443 --node-name="$PRIVATE_HOSTNAME" --experimental-control-plane
 
 # Allow other masters to join
 # https://github.com/cookeem/kubeadm-ha#kubeadm-init
