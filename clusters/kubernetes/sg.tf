@@ -31,7 +31,7 @@ resource "aws_security_group" "k8s_base" {
   }
 
   tags {
-    Name      = "k8s-${var.cluster}-node"
+    Name      = "k8s-${var.cluster}-base"
     Cluster   = "${var.cluster}"
     Version   = "${var.version}"
     Terraform = "true"
