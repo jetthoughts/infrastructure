@@ -1,12 +1,12 @@
 locals {
-  ec2_tags        = "${merge(map("Name", format("k8s-%s-master", var.name), "KubernetesCluster", "${var.name}", "kubernetes.io/cluster/${var.name}", "true"), var.tags)}"
-  pki_path        = "${var.certs_path}/pki/"
+  ec2_tags = "${merge(map("Name", format("k8s-%s-master", var.name), "KubernetesCluster", "${var.name}", "kubernetes.io/cluster/${var.name}", "true"), var.tags)}"
+  pki_path = "${var.certs_path}/pki/"
 
   base_domain     = "${var.name}.${var.dns_primary_domain}"
   domain          = "api.${local.base_domain}"
   internal_domain = "internal.${local.base_domain}"
 
-  cluster_size    = "${length(var.master_addresses)}"
+  cluster_size = "${length(var.master_addresses)}"
 }
 
 resource "aws_instance" "masters" {
@@ -45,10 +45,9 @@ resource "aws_instance" "masters" {
   volume_tags = "${local.ec2_tags}"
 }
 
-
 resource "null_resource" "bootstrap_bastion" {
   depends_on = [
-    "aws_instance.masters"
+    "aws_instance.masters",
   ]
 
   count = "${var.bastion["host"] == "" ? 0 : local.cluster_size}"
@@ -126,14 +125,16 @@ resource "null_resource" "bootstrap_bastion" {
       "sudo /tmp/terraform/00pre_init_script.sh",
       "sudo /tmp/terraform/packages.sh",
       "sudo /tmp/terraform/kube_packages.sh",
+
       # "sudo /tmp/terraform/k8s_kubelet_extra_args.sh",
       "sudo /tmp/terraform/certificates.sh",
-  #     "sudo /tmp/terraform/kubeadm_config.sh",
-  #     "sudo /tmp/terraform/master.sh || exit",
-  #     "sudo /tmp/terraform/cni.sh",
-  #     "sudo /tmp/terraform/admin.sh",
-  #     "sudo shutdown -r +1",
     ]
+
+    #     "sudo /tmp/terraform/kubeadm_config.sh",
+    #     "sudo /tmp/terraform/master.sh || exit",
+    #     "sudo /tmp/terraform/cni.sh",
+    #     "sudo /tmp/terraform/admin.sh",
+    #     "sudo shutdown -r +1",
   }
 }
 
@@ -141,13 +142,13 @@ resource "null_resource" "bootstrap_public" {
   count = "${var.bastion["host"] == "" ? local.cluster_size : 0}"
 
   depends_on = [
-    "module.certificates"
+    "module.certificates",
   ]
 
   connection {
-    host                = "${element(aws_instance.masters.*.public_ip, count.index)}"
-    user                = "${var.remote_user}"
-    private_key         = "${file("${var.asset_path}/${var.ssh_key_name}")}"
+    host        = "${element(aws_instance.masters.*.public_ip, count.index)}"
+    user        = "${var.remote_user}"
+    private_key = "${file("${var.asset_path}/${var.ssh_key_name}")}"
   }
 
   provisioner "remote-exec" {
@@ -162,7 +163,7 @@ resource "null_resource" "bootstrap_public" {
   }
 
   provisioner "file" {
-    content      = "${var.pre_init_script}"
+    content     = "${var.pre_init_script}"
     destination = "/tmp/terraform/pre_init_script.sh"
   }
 
@@ -224,7 +225,6 @@ resource "null_resource" "bootstrap_public" {
   }
 }
 
-
 data "template_file" "master_user_data" {
   template = "${file("${path.module}/data/master_init.tpl.sh")}"
 
@@ -238,18 +238,18 @@ data "template_file" "kubeadm_config" {
   template = "${file("${path.module}/data/kubeadm_config.tpl.sh")}"
 
   vars {
-    name                      = "${var.name}"
-    bootstrap_token           = "${var.bootstrap_token}"
-    kube_version              = "${var.kube_version}"
-    pod_network_cidr          = "${var.pod_network_cidr}"
-    service_network_cidr      = "${var.service_network_cidr}"
-    domain                    = "${local.domain}"
-    internal_domain           = "${local.internal_domain}"
-    google_oauth_client_id    = "${var.google_oauth_client_id}"
-    cluster_size              = "${local.cluster_size}"
-    master_ips                = "\"${join("\" \"", concat(var.master_addresses, var.cert_sans))}\""
-    etcd_endpoints            = "\"${join("\" \"", var.etcd_endpoints)}\""
-    etcd_prefix               = "${var.etcd_prefix}"
+    name                   = "${var.name}"
+    bootstrap_token        = "${var.bootstrap_token}"
+    kube_version           = "${var.kube_version}"
+    pod_network_cidr       = "${var.pod_network_cidr}"
+    service_network_cidr   = "${var.service_network_cidr}"
+    domain                 = "${local.domain}"
+    internal_domain        = "${local.internal_domain}"
+    google_oauth_client_id = "${var.google_oauth_client_id}"
+    cluster_size           = "${local.cluster_size}"
+    master_ips             = "\"${join("\" \"", concat(var.master_addresses, var.cert_sans))}\""
+    etcd_endpoints         = "\"${join("\" \"", var.etcd_endpoints)}\""
+    etcd_prefix            = "${var.etcd_prefix}"
   }
 }
 
