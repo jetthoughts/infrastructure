@@ -43,6 +43,9 @@ sudo yum install -y docker-ce docker-ce-cli containerd.io \
                     ceph-common wget perf wireshark tcpdump httping sysstat \
                     ipvsadm perf tmux vim bind-utils
 
+docker version
+kubeadm version
+
 cat <<EOF | sudo tee /etc/sysctl.d/k8s.conf
 # /etc/sysctl.d/k8s.conf
 net.bridge.bridge-nf-call-ip6tables = 1

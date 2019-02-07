@@ -22,5 +22,9 @@ sudo wget -q -O $(which kubeadm) https://storage.googleapis.com/kubernetes-relea
 sudo wget -q -O $(which kubectl) https://storage.googleapis.com/kubernetes-release/release/$KUBE_VERSION/bin/linux/amd64/kubectl
 sudo wget -q -O $(which kubelet) https://storage.googleapis.com/kubernetes-release/release/$KUBE_VERSION/bin/linux/amd64/kubelet
 
+kubeadm version -o short
+kubectl version
+kubelet --version
+
 sudo systemctl restart kubelet
 sudo systemctl restart docker
