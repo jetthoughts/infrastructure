@@ -7,7 +7,7 @@ sudo yum update -y
 
 # Install kernel 4 for ipvs
 sudo rpm --import https://www.elrepo.org/RPM-GPG-KEY-elrepo.org
-sudo rpm -Uvh http://www.elrepo.org/elrepo-release-7.0-3.el7.elrepo.noarch.rpm
+sudo rpm -Uvh http://www.elrepo.org/elrepo-release-7.0-3.el7.elrepo.noarch.rpm || true
 sudo yum install yum-plugin-fastestmirror
 sudo uname -a
 sudo yum --enablerepo=elrepo-kernel install -y kernel-ml
@@ -43,7 +43,6 @@ sudo yum install -y docker-ce docker-ce-cli containerd.io \
                     ceph-common wget perf wireshark tcpdump httping sysstat \
                     ipvsadm perf tmux vim bind-utils
 
-docker version
 kubeadm version
 
 cat <<EOF | sudo tee /etc/sysctl.d/k8s.conf
@@ -62,6 +61,8 @@ sudo sysctl --system
 
 sudo systemctl enable docker && sudo systemctl start docker
 sudo systemctl enable kubelet && sudo systemctl start kubelet
+
+docker version
 
 echo -e "ip_vs\nip_vs_rr\nip_vs_wrr\nip_vs_sh\nnf_conntrack_ipv4" | sudo tee -a /etc/modules-load.d/99-ip_vs.conf
 

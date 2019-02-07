@@ -10,21 +10,11 @@ export PRIVATE_HOSTNAME=$(curl -s http://169.254.169.254/latest/meta-data/hostna
 
 KUBEADM_CONFIG="/etc/kubernetes/kubeadm.yml"
 
-# https://godoc.org/k8s.io/kubernetes/cmd/kubeadm/app/apis/kubeadm/v1alpha3
+# https://godoc.org/k8s.io/kubernetes/cmd/kubeadm/app/apis/kubeadm/v1beta1
 cat <<EOF > $KUBEADM_CONFIG
 
 ---
 
-apiVersion: kubeadm.k8s.io/v1beta1
-kind: ClusterConfiguration
-kubernetesVersion: ${kube_version}
-apiServer:
-  certSANs:
-  - ${internal_domain}
-controlPlaneEndpoint: "${internal_domain}:6443"
-
-
----
 apiVersion: kubeadm.k8s.io/v1beta1
 kind: InitConfiguration
 
@@ -59,35 +49,38 @@ networking:
 kubernetesVersion: ${kube_version}
 #controlPlaneEndpoint: "$PRIVATE_IP:6443"
 #controlPlaneEndpoint: ${internal_domain}
-apiServerExtraArgs:
-  # authorization-mode: "Node,RBAC"
-  apiserver-count: "${cluster_size}"
-  # runtime-config: "api/all=true,batch/v1beta1=true"
-  oidc-issuer-url: "https://accounts.google.com"
-  oidc-username-claim: email
-  oidc-client-id: ${google_oauth_client_id}
-  etcd-prefix: "${etcd_prefix}"
-  # cloud-provider: aws
+controlPlaneEndpoint: "${internal_domain}:6443"
 
 # featureGates:
 #   CoreDNS: true
 #   DynamicKubeletConfig: true
 
-apiServerCertSANs:
-  - localhost
-  - 127.0.0.1
-  - 10.96.0.1
-  - $PRIVATE_IP
-  - $PRIVATE_HOSTNAME
-  - ${domain}
-  - ${internal_domain}
+apiServer:
+  extraArgs:
+    # authorization-mode: "Node,RBAC"
+    apiserver-count: "${cluster_size}"
+    # runtime-config: "api/all=true,batch/v1beta1=true"
+    oidc-issuer-url: "https://accounts.google.com"
+    oidc-username-claim: email
+    oidc-client-id: ${google_oauth_client_id}
+    # etcd-prefix: "${etcd_prefix}"
+    # cloud-provider: aws
+
+  certSANs:
+    - localhost
+    - 127.0.0.1
+    - 10.96.0.1
+    - $PRIVATE_IP
+    - $PRIVATE_HOSTNAME
+    - ${domain}
+    - ${internal_domain}
 EOF
 
 MASTER_IPS="${master_ips}"
 if [ "$MASTER_IPS" != "" ]; then
   for ipaddress in $MASTER_IPS
   do
-    echo "  - $ipaddress" >> $KUBEADM_CONFIG
+    echo "    - $ipaddress" >> $KUBEADM_CONFIG
   done
 fi
 

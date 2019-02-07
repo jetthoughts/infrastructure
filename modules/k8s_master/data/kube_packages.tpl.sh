@@ -23,7 +23,7 @@ sudo wget -q -O $(which kubectl) https://storage.googleapis.com/kubernetes-relea
 sudo wget -q -O $(which kubelet) https://storage.googleapis.com/kubernetes-release/release/$KUBE_VERSION/bin/linux/amd64/kubelet
 
 kubeadm version -o short
-kubectl version
+kubectl version --client
 kubelet --version
 
 sudo systemctl restart kubelet
