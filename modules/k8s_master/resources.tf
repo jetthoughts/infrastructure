@@ -143,7 +143,12 @@ resource "null_resource" "bootstrap_public" {
 
   depends_on = [
     "module.certificates",
+    "aws_instance.masters",
   ]
+
+  triggers {
+    host = "${element(aws_instance.masters.*.public_ip, count.index)}"
+  }
 
   connection {
     host        = "${element(aws_instance.masters.*.public_ip, count.index)}"
@@ -214,13 +219,13 @@ resource "null_resource" "bootstrap_public" {
       "sudo /tmp/terraform/pre_init_script.sh",
       "sudo /tmp/terraform/packages.sh",
       "sudo /tmp/terraform/kube_packages.sh",
-      "sudo /tmp/terraform/k8s_kubelet_extra_args.sh",
+      # "sudo /tmp/terraform/k8s_kubelet_extra_args.sh",
       "sudo /tmp/terraform/certificates.sh",
       "sudo /tmp/terraform/kubeadm_config.sh",
-      "sudo /tmp/terraform/master.sh || exit",
-      "sudo /tmp/terraform/cni.sh",
-      "sudo /tmp/terraform/admin.sh",
-      "sudo shutdown -r +1",
+      # "sudo /tmp/terraform/master.sh || exit",
+      # "sudo /tmp/terraform/cni.sh",
+      # "sudo /tmp/terraform/admin.sh",
+      # "sudo shutdown -r +1",
     ]
   }
 }

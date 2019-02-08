@@ -39,7 +39,7 @@ module "k8s_master" {
   admin_email  = "${var.admin_email}"
 
   # etcd_endpoints   = "${var.etcd_endpoints}"
-  certs_path       = "${path.module}/assets/v114"
+  certs_path       = "${path.module}/assets/${var.cluster}"
   master_addresses = "${var.master_ips}"
 
   # Canal
