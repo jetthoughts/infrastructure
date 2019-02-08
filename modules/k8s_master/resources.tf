@@ -238,6 +238,7 @@ data "template_file" "master_init" {
     kube_version            = "${var.kube_version}"
     domain                  = "${local.internal_domain}"
     kubeadm_bootstrap_token = "${var.bootstrap_token}"
+    etcd_endpoints          = "${join(":2379,", var.master_addresses)}:2379"
   }
 }
 

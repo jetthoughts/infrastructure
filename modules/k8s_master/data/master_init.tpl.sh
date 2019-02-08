@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -euo pipefail
+set -xeuo pipefail
 
 echo "master_init.tpl.sh"
 # https://coreos.com/os/docs/latest/cluster-discovery.html
@@ -30,10 +30,26 @@ echo $join
 if [ "$join" = "" ]; then
   kubeadm init --config /etc/kubernetes/kubeadm.yml
 else
-  kubeadm join --token="${kubeadm_bootstrap_token}" ${domain}:6443 --apiserver-advertise-address="$PRIVATE_IP" --node-name="$PRIVATE_HOSTNAME" --experimental-control-plane --discovery-token-unsafe-skip-ca-verification
-fi
+  kubeadm init phase certs all --config /etc/kubernetes/kubeadm.yml
 
-# kubeadm init --config /etc/kubernetes/kubeadm.yml
+    export ETCDCTL_ENDPOINTS="${etcd_endpoints}"
+
+    kubeadm init phase certs all --config /etc/kubernetes/kubeadm.yml
+
+    etcdcli="docker run --net=host -v /etc/kubernetes/pki/etcd:/etc/kubernetes/pki/etcd -e ETCDCTL_API=3 -it --rm k8s.gcr.io/etcd:3.3.10 etcdctl --endpoints=$ETCDCTL_ENDPOINTS --cacert=/etc/kubernetes/pki/etcd/ca.crt --cert=/etc/kubernetes/pki/etcd/peer.crt  --key=/etc/kubernetes/pki/etcd/peer.key"
+
+    members=$($etcdcli member list)
+    echo $members
+
+    member_id=$(echo "$members" | grep "$PRIVATE_HOSTNAME" | cut -f1 -d',' || echo -n)
+    echo $member_id
+
+    if "$member_id" != "" ]; then
+      $etcdcli member remove $member_id
+    fi
+
+  kubeadm join --token="${kubeadm_bootstrap_token}" ${domain}:6443 --apiserver-advertise-address="$PRIVATE_IP" --node-name="$PRIVATE_HOSTNAME" --experimental-control-plane --discovery-token-unsafe-skip-ca-verification -v7
+fi
 
 # kubeadm join --token="kubeadm_bootstrap_token" ${domain}:6443 --node-name="$PRIVATE_HOSTNAME" --experimental-control-plane
 

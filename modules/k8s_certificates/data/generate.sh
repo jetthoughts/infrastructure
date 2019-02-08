@@ -12,14 +12,13 @@ sans=$*
 
 readonly kubeadm="docker run --rm -v $output:/etc/kubernetes miry/kubernetes:$version /bin/kubeadm"
 
-$kubeadm init phase certs all --apiserver-cert-extra-sans "${sans}"
-$kubeadm alpha certs renew all
+$kubeadm init phase certs ca
+$kubeadm init phase certs etcd-ca
+$kubeadm init phase certs sa
+$kubeadm init phase certs front-proxy-ca
 
 $kubeadm init phase kubeconfig admin
 
 docker run --rm -v $output:/etc/kubernetes miry/kubernetes:$version \
        sh -c "/bin/kubeadm alpha kubeconfig user --client-name=\"${name}\" 2>/dev/null" > $output/user.conf
 
-rm -f $output/pki/etcd/{server,peer,healthcheck-client}.{crt,key}
-rm -f $output/pki/*client*
-rm -f $output/pki/apiserver*

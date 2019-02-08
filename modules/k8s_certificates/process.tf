@@ -1,11 +1,10 @@
 resource "null_resource" "generate_pki" {
   triggers {
-    cert_sans = "${var.cert_sans}"
     ca_exists = "${data.external.cert_exists.result.exists}"
   }
 
   provisioner "local-exec" {
-    command = "${path.module}/data/generate.sh ${var.name} ${var.kube_version} ${var.certs_path} '${var.cert_sans}'"
+    command = "${path.module}/data/generate.sh ${var.name} ${var.kube_version} ${var.certs_path}"
   }
 }
 
