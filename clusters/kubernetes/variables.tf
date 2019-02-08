@@ -7,6 +7,12 @@ variable "master_ips" {
   description = "Private ip addresses for future masters."
 }
 
+variable "cert_sans" {
+  type        = "list"
+  description = "Private ip addresses for future masters."
+  default     = ["localhost"]
+}
+
 variable "admin_email" {
   default = "amdin@example.com"
 }
@@ -53,10 +59,10 @@ variable "vpc_id" {
 
 variable "availability_zone" {
   description = "Existing availability_zone of your vpc"
-  default = ""
+  default     = ""
 }
 
 variable "subnet_id" {
   description = "Existing subnet id of your vpc"
-  default = ""
+  default     = ""
 }

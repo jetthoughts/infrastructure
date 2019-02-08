@@ -104,7 +104,7 @@ resource "null_resource" "bootstrap_bastion" {
   }
 
   provisioner "file" {
-    content     = "${data.template_file.master_user_data.rendered}"
+    content     = "${data.template_file.master_init.rendered}"
     destination = "/tmp/terraform/master.sh"
   }
 
@@ -145,10 +145,6 @@ resource "null_resource" "bootstrap_public" {
     "module.certificates",
     "aws_instance.masters",
   ]
-
-  triggers {
-    host = "${element(aws_instance.masters.*.public_ip, count.index)}"
-  }
 
   connection {
     host        = "${element(aws_instance.masters.*.public_ip, count.index)}"
@@ -198,7 +194,7 @@ resource "null_resource" "bootstrap_public" {
   }
 
   provisioner "file" {
-    content     = "${data.template_file.master_user_data.rendered}"
+    content     = "${data.template_file.master_init.rendered}"
     destination = "/tmp/terraform/master.sh"
   }
 
@@ -222,20 +218,21 @@ resource "null_resource" "bootstrap_public" {
       # "sudo /tmp/terraform/k8s_kubelet_extra_args.sh",
       "sudo /tmp/terraform/certificates.sh",
       "sudo /tmp/terraform/kubeadm_config.sh",
-      # "sudo /tmp/terraform/master.sh || exit",
-      # "sudo /tmp/terraform/cni.sh",
-      # "sudo /tmp/terraform/admin.sh",
-      # "sudo shutdown -r +1",
+      "sudo /tmp/terraform/master.sh || exit",
+      "sudo /tmp/terraform/cni.sh",
+      "sudo /tmp/terraform/admin.sh || true",
+      "sudo shutdown -r +1",
     ]
   }
 }
 
-data "template_file" "master_user_data" {
+data "template_file" "master_init" {
   template = "${file("${path.module}/data/master_init.tpl.sh")}"
 
   vars {
     kube_version = "${var.kube_version}"
     domain       = "${local.internal_domain}"
+    kubeadm_bootstrap_token       = "${var.bootstrap_token}"
   }
 }
 

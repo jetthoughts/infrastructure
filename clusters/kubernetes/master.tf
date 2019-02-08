@@ -1,7 +1,7 @@
 locals {
-  ami_id = "${var.ami_id == "" ? data.aws_ami.centos.image_id : var.ami_id}"
+  ami_id            = "${var.ami_id == "" ? data.aws_ami.centos.image_id : var.ami_id}"
   availability_zone = "${var.availability_zone == "" ? element(concat(aws_subnet.public_1a.*.availability_zone, list("")), 0) : var.availability_zone}"
-  subnet_id = "${var.subnet_id == "" ? element(concat(aws_subnet.public_1a.*.id, list("")), 0) : var.subnet_id}"
+  subnet_id         = "${var.subnet_id == "" ? element(concat(aws_subnet.public_1a.*.id, list("")), 0) : var.subnet_id}"
 
   vpc_id = "${var.vpc_id == "" ? element(concat(aws_vpc.kubernetes.*.id, list("")), 0) : var.vpc_id}"
 }
@@ -41,6 +41,7 @@ module "k8s_master" {
   # etcd_endpoints   = "${var.etcd_endpoints}"
   certs_path       = "${path.module}/assets/${var.cluster}"
   master_addresses = "${var.master_ips}"
+  cert_sans        = "${var.cert_sans}"
 
   # Canal
   # pod_network_cidr = "10.244.0.0/16"
@@ -55,9 +56,8 @@ module "k8s_master" {
     kubectl apply -f https://docs.projectcalico.org/v3.3/getting-started/kubernetes/installation/hosted/rbac-kdd.yaml
     kubectl apply -f https://docs.projectcalico.org/v3.3/getting-started/kubernetes/installation/hosted/kubernetes-datastore/calico-networking/1.7/calico.yaml
   EOF
-
   tags = {
-    Role = "master"
+    Role      = "master"
     Terraform = "true"
   }
 }

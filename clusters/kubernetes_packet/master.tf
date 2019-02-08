@@ -62,7 +62,7 @@ resource "packet_device" "masters" {
   }
 
   provisioner "file" {
-    content     = "${data.template_file.master_user_data.rendered}"
+    content     = "${data.template_file.master_init.rendered}"
     destination = "/tmp/terraform/master.sh"
   }
 
@@ -94,11 +94,11 @@ resource "packet_device" "masters" {
   }
 }
 
-data "template_file" "master_user_data" {
+data "template_file" "master_init" {
   template = "${file("${path.module}/data/master_init.tpl.sh")}"
 
   vars {
-    k8s_token              = "${var.k8s_token}"
+    kubeadm_bootstrap_token              = "${var.k8s_token}"
     k8s_version            = "${var.k8s_version}"
     k8s_pod_network_cidr   = "${var.k8s_pod_network_cidr}"
     domain                 = "${var.domain}"

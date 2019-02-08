@@ -17,6 +17,24 @@ resource "aws_security_group" "k8s_base" {
     description = "ssh: Access to the node. Managed by Terraform."
   }
 
+  ingress {
+    from_port = 179
+    to_port   = 179
+    protocol  = "tcp"
+    self      = true
+
+    description = "calico: Calico networking (BGP). Managed by Terraform."
+  }
+
+  ingress {
+    from_port = 5473
+    to_port   = 5473
+    protocol  = "tcp"
+    self      = true
+
+    description = "calico: Calico networking with Typha enabled. Managed by Terraform."
+  }
+
   egress {
     from_port = 0
     to_port   = 0
@@ -57,6 +75,15 @@ resource "aws_security_group" "k8s_master" {
     description = "kube-api-server: Send requests to api server from kubectl. Managed by Terraform."
   }
 
+  ingress {
+    from_port = 2379
+    to_port   = 2380
+    protocol  = "tcp"
+    self      = true
+
+    description = "etcd: Configure etcd cluster. Managed by Terraform."
+  }
+
   egress {
     from_port = 0
     to_port   = 0
@@ -78,8 +105,6 @@ resource "aws_security_group" "k8s_master" {
   }
 }
 
-
-
 resource "aws_security_group" "k8s_nodes" {
   provider    = "aws.virginia"
   description = "K8s nodes. Managed by Terraform."
@@ -94,6 +119,7 @@ resource "aws_security_group" "k8s_nodes" {
   #   protocol  = "tcp"
   #   self      = true
   # }
+
 
   # //  cadvisor port
   # ingress {
@@ -128,4 +154,3 @@ resource "aws_security_group" "k8s_nodes" {
     Terraform = "true"
   }
 }
-

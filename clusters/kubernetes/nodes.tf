@@ -10,21 +10,17 @@
 #   availability_zone = "${local.availability_zone}"
 #   subnet_id         = "${local.subnet_id}"
 #   image_id          = "${local.ami_id}"
-
 #   security_groups = [
 #     "${aws_security_group.k8s_nodes.id}",
 #   ]
-
 #   ssh_key_name = "${aws_key_pair.k8s.key_name}"
 #   spot_price   = "0.1"
 #   min_size     = "1"
 #   max_size     = "1"
-
 #   node_labels = [
 #     "beta.kubernetes.io/instance-lifecycle=spot",
 #     "role=general",
 #   ]
-
 #   tags = [
 #     {
 #       key                 = "kubernetes.io/cluster/${var.cluster}"
@@ -43,3 +39,4 @@
 #     },
 #   ]
 # }
+

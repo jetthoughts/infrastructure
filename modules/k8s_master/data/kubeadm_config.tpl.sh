@@ -1,5 +1,7 @@
 #!/bin/bash -xeu
 
+set -euo pipefail
+
 echo "kubeadm_config.tpl.sh"
 # kubeadm init --pod-network-cidr=192.168.0.0/16 --kubernetes-version=1.14.0-alpha.2
 
@@ -12,9 +14,7 @@ KUBEADM_CONFIG="/etc/kubernetes/kubeadm.yml"
 
 # https://godoc.org/k8s.io/kubernetes/cmd/kubeadm/app/apis/kubeadm/v1beta1
 cat <<EOF > $KUBEADM_CONFIG
-
 ---
-
 apiVersion: kubeadm.k8s.io/v1beta1
 kind: InitConfiguration
 
@@ -24,19 +24,6 @@ bootstrapTokens:
     ttl: "0h0m0s"
 nodeRegistration:
   name: $PRIVATE_HOSTNAME
-  # apiEndpoint:
-  #   advertiseAddress: "$PRIVATE_IP"
-  #   bindPort: 6443
-# ---
-# # https://godoc.org/k8s.io/kubelet/config/v1beta1#KubeletConfiguration
-# apiVersion: kubelet.config.k8s.io/v1beta1
-# kind: KubeletConfiguration
-# evictionHard:
-#     memory.available:  "300Mi"
-# cloudProvider: aws
-# cgroupDriver: systemd
-# runtimeCgroups: /systemd/system.slice
-# kubeletCgroups: /systemd/system.slice
 
 ---
 
@@ -47,13 +34,7 @@ networking:
   # serviceSubnet: "${service_network_cidr}"
   podSubnet: "${pod_network_cidr}"
 kubernetesVersion: ${kube_version}
-#controlPlaneEndpoint: "$PRIVATE_IP:6443"
-#controlPlaneEndpoint: ${internal_domain}
 controlPlaneEndpoint: "${internal_domain}:6443"
-
-# featureGates:
-#   CoreDNS: true
-#   DynamicKubeletConfig: true
 
 apiServer:
   extraArgs:
@@ -125,5 +106,16 @@ kubeProxy:
       min: 524288
       tcpCloseWaitTimeout: 0h10m0s
       tcpEstablishedTimeout: 1h0m0s
+
+---
+# https://godoc.org/k8s.io/kubelet/config/v1beta1#KubeletConfiguration
+apiVersion: kubelet.config.k8s.io/v1beta1
+kind: KubeletConfiguration
+evictionHard:
+    memory.available:  "300Mi"
+cloudProvider: aws
+cgroupDriver: systemd
+runtimeCgroups: /systemd/system.slice
+kubeletCgroups: /systemd/system.slice
 
 EOF
