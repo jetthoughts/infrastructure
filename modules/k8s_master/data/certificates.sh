@@ -9,4 +9,4 @@ mkdir -p /etc/kubernetes/
 cp -r /tmp/terraform/pki /etc/kubernetes
 ls -la /etc/kubernetes/pki
 
-openssl x509 -noout -text -in /etc/kubernetes/pki/apiserver.crt
+openssl x509 -noout -text -in /etc/kubernetes/pki/ca.crt

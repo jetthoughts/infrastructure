@@ -21,3 +21,5 @@ docker run --rm -v $output:/etc/kubernetes miry/kubernetes:$version \
        sh -c "/bin/kubeadm alpha kubeconfig user --client-name=\"${name}\" 2>/dev/null" > $output/user.conf
 
 rm -f $output/pki/etcd/{server,peer,healthcheck-client}.{crt,key}
+rm -f $output/pki/*client*
+rm -f $output/pki/apiserver*

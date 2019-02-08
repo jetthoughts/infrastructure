@@ -14,8 +14,6 @@ resource "aws_instance" "masters" {
 
   depends_on = [
     "aws_iam_role_policy.masters",
-    "module.certificates",
-    "aws_route53_record.internal",
   ]
 
   ami           = "${var.image_id}"
@@ -48,6 +46,7 @@ resource "aws_instance" "masters" {
 resource "null_resource" "bootstrap_bastion" {
   depends_on = [
     "aws_instance.masters",
+    "aws_route53_record.internal",
   ]
 
   count = "${var.bastion["host"] == "" ? 0 : local.cluster_size}"
@@ -142,12 +141,16 @@ resource "null_resource" "bootstrap_public" {
   count = "${var.bastion["host"] == "" ? local.cluster_size : 0}"
 
   depends_on = [
+    "aws_route53_record.internal",
     "module.certificates",
-    "aws_instance.masters",
   ]
 
+  triggers {
+    cluster_instance = "${aws_instance.masters.*.id[count.index]}"
+  }
+
   connection {
-    host        = "${element(aws_instance.masters.*.public_ip, count.index)}"
+    host        = "${aws_instance.masters.*.public_ip[count.index]}"
     user        = "${var.remote_user}"
     private_key = "${file("${var.asset_path}/${var.ssh_key_name}")}"
   }
@@ -215,8 +218,10 @@ resource "null_resource" "bootstrap_public" {
       "sudo /tmp/terraform/pre_init_script.sh",
       "sudo /tmp/terraform/packages.sh",
       "sudo /tmp/terraform/kube_packages.sh",
+
       # "sudo /tmp/terraform/k8s_kubelet_extra_args.sh",
       "sudo /tmp/terraform/certificates.sh",
+
       "sudo /tmp/terraform/kubeadm_config.sh",
       "sudo /tmp/terraform/master.sh || exit",
       "sudo /tmp/terraform/cni.sh",
@@ -230,9 +235,9 @@ data "template_file" "master_init" {
   template = "${file("${path.module}/data/master_init.tpl.sh")}"
 
   vars {
-    kube_version = "${var.kube_version}"
-    domain       = "${local.internal_domain}"
-    kubeadm_bootstrap_token       = "${var.bootstrap_token}"
+    kube_version            = "${var.kube_version}"
+    domain                  = "${local.internal_domain}"
+    kubeadm_bootstrap_token = "${var.bootstrap_token}"
   }
 }
 
