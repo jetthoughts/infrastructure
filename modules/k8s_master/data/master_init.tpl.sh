@@ -22,7 +22,7 @@ join=""
 ips=$(dig ${domain} +short A)
 for ip in $ips ; do
   echo $ip
-  curl --silent -f -k https://$ip:6443/healthz > /dev/null && join="join"
+  curl -v -f -k https://$ip:6443/healthz --retry 3 --retry-delay 1 && join="join"
 done
 
 echo $join
@@ -44,7 +44,7 @@ else
     member_id=$(echo "$members" | grep "$PRIVATE_HOSTNAME" | cut -f1 -d',' || echo -n)
     echo $member_id
 
-    if "$member_id" != "" ]; then
+    if [ "$member_id" != "" ]; then
       $etcdcli member remove $member_id
     fi
 
