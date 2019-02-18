@@ -1,0 +1,55 @@
+#!/usr/bin/env bash
+
+set -xe
+
+cluster="staging"
+region="ap-northeast-1"
+
+# terraform init
+
+aws ec2 describe-instances --region $region \
+                           --filters 'Name=tag-key,Values=Cluster' "Name=tag-value,Values=${cluster}" 'Name=instance-state-name,Values=running' \
+                           --query "Reservations[*].Instances[*].[PrivateDnsName,Tags[?Key=='Role']| [0].Value]" \
+                           --output table
+
+terraform apply -target=aws_key_pair.k8s
+
+echo "Destroy old masters..."
+terraform taint -module=k8s_master aws_instance.masters
+
+echo "Generate new certificates..."
+
+rm -fr ./assets/${cluster}
+terraform taint -module=k8s_master.certificates null_resource.generate_pki || true
+terraform taint -module=k8s_master.certificates null_resource.extract_admin_key  || true
+terraform apply -target=module.k8s_master.module.certificates.null_resource.generate_pki -target=module.k8s_master.module.certificates.null_resource.extract_admin_key
+
+echo "Build new master..."
+terraform apply -target=module.k8s_master.null_resource.bootstrap_public
+
+aws ec2 describe-instances --region $region \
+                           --filters 'Name=tag-key,Values=Cluster' "Name=tag-value,Values=${cluster}" 'Name=instance-state-name,Values=running' \
+                           --query "Reservations[*].Instances[*].[PrivateDnsName,Tags[?Key=='Role']| [0].Value]" \
+                           --output table
+
+echo "Update domain name for new master ips..."
+terraform apply -target=module.k8s_master.aws_route53_record.api
+
+echo "Check master nodes"
+readonly domain=$(terraform output domain)
+sed -i 's/server: https:\/\/.*:6443/server: https:\/\/'$domain':6443/' ./assets/$cluster/admin.conf
+sed -i 's/server: https:\/\/.*:6443/server: https:\/\/'$domain':6443/' ./assets/$cluster/user.conf
+
+kubectl --kubeconfig ./assets/staging/admin.conf get no -o wide
+
+exit 1
+
+echo "Rebuilding slaves..."
+terraform apply -target=module.k8s_node.aws_autoscaling_group.node -target=module.k8s_node.aws_launch_configuration.node
+
+echo "Destroy old slaves..."
+for i in $(aws ec2 describe-instances --region $region --filters 'Name=tag-key,Values=Cluster' "Name=tag-value,Values=${cluster}" 'Name=tag-key,Values=Role' "Name=tag-value,Values=k8s-node" 'Name=instance-state-name,Values=running' --query 'Reservations[].Instances[].InstanceId' --output text)
+do
+    echo $i
+    aws ec2 terminate-instances --instance-ids $i
+done

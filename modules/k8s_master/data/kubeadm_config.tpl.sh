@@ -75,7 +75,7 @@ EOF
 
   for endpoint in $ETCD_ENDPOINTS
   do
-    echo "    - $endpoint" >> $KUBEADM_CONFIG
+    echo "      - $endpoint" >> $KUBEADM_CONFIG
   done
 fi
 

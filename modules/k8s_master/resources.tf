@@ -1,5 +1,5 @@
 locals {
-  ec2_tags = "${merge(map("Name", format("k8s-%s-master", var.name), "KubernetesCluster", "${var.name}", "kubernetes.io/cluster/${var.name}", "true"), var.tags)}"
+  ec2_tags = "${merge(map("Name", format("k8s_%s_master", var.name), "KubernetesCluster", "${var.name}", "kubernetes.io/cluster/${var.name}", "true"), var.tags)}"
   pki_path = "${var.certs_path}/pki/"
 
   base_domain     = "${var.name}.${var.dns_primary_domain}"
@@ -238,7 +238,7 @@ data "template_file" "master_init" {
     kube_version            = "${var.kube_version}"
     domain                  = "${local.internal_domain}"
     kubeadm_bootstrap_token = "${var.bootstrap_token}"
-    etcd_endpoints          = "${join(":2379,", var.master_addresses)}:2379"
+    # etcd_endpoints          = "${join(":2379,", var.master_addresses)}:2379"
   }
 }
 

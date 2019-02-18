@@ -43,6 +43,25 @@ sudo yum install -y docker-ce docker-ce-cli containerd.io \
                     ceph-common wget perf wireshark tcpdump httping sysstat \
                     ipvsadm perf tmux vim bind-utils
 
+# Docker config
+sudo mkdir /etc/docker
+cat  <<EOF | sudo tee /etc/docker/daemon.json
+{
+  "exec-opts": ["native.cgroupdriver=systemd"],
+  "log-driver": "json-file",
+  "log-opts": {
+    "max-size": "100m"
+  },
+  "storage-driver": "overlay2",
+  "storage-opts": [
+    "overlay2.override_kernel_check=true"
+  ]
+}
+EOF
+sudo mkdir -p /etc/systemd/system/docker.service.d
+
+sudo systemctl daemon-reload
+
 kubeadm version
 
 cat <<EOF | sudo tee /etc/sysctl.d/k8s.conf
@@ -59,8 +78,8 @@ net.ipv6.conf.default.disable_ipv6=1
 EOF
 sudo sysctl --system
 
-sudo systemctl enable docker && sudo systemctl start docker
-sudo systemctl enable kubelet && sudo systemctl start kubelet
+sudo systemctl enable docker && sudo systemctl restart docker
+sudo systemctl enable kubelet && sudo systemctl restart kubelet
 
 docker version
 
