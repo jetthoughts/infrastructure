@@ -28,6 +28,7 @@ module "k8s_master" {
   admin_email  = "${var.admin_email}"
 
   etcd_endpoints   = "${var.etcd_endpoints}"
+  etcd_prefix      = "/staging"
   certs_path       = "${path.module}/assets/${var.cluster}"
   master_addresses = "${var.master_addresses}"
   cert_sans        = "${var.cert_sans}"
@@ -35,8 +36,8 @@ module "k8s_master" {
   # Calico
   pod_network_cidr = "192.168.0.0/16"
   cni_install_script = <<EOF
-    kubectl apply -f https://docs.projectcalico.org/v3.3/getting-started/kubernetes/installation/hosted/rbac-kdd.yaml
-    kubectl apply -f https://docs.projectcalico.org/v3.3/getting-started/kubernetes/installation/hosted/kubernetes-datastore/calico-networking/1.7/calico.yaml
+kubectl apply -f https://docs.projectcalico.org/v3.5/getting-started/kubernetes/installation/hosted/etcd.yaml
+kubectl apply -f https://docs.projectcalico.org/v3.5/getting-started/kubernetes/installation/hosted/calico.yaml
   EOF
   tags = {
     Role      = "master"

@@ -24,11 +24,27 @@ bootstrapTokens:
     ttl: "0h0m0s"
 nodeRegistration:
   name: $PRIVATE_HOSTNAME
+  kubeletExtraArgs:
+    cgroup-driver: systemd
+    cloud-provider: external
+---
+apiVersion: kubelet.config.k8s.io/v1beta1
+kind: KubeletConfiguration
+
+cgroupDriver: systemd
+imageMinimumGCAge: 5m0s
+cpuCFSQuota: false
+enforceNodeAllocatable: []
+evictionHard:
+  imagefs.available: 15%
+  memory.available: 100Mi
+  nodefs.available: 10%
+  nodefs.inodesFree: 5%
 
 ---
-
 apiVersion: kubeadm.k8s.io/v1beta1
 kind: ClusterConfiguration
+
 # clusterName: "${name}"
 networking:
   # serviceSubnet: "${service_network_cidr}"
@@ -44,7 +60,7 @@ apiServer:
     oidc-issuer-url: "https://accounts.google.com"
     oidc-username-claim: email
     oidc-client-id: ${google_oauth_client_id}
-    # etcd-prefix: "${etcd_prefix}"
+    etcd-prefix: "${etcd_prefix}"
     # cloud-provider: aws
 
   certSANs:

@@ -16,8 +16,6 @@ do
   docker ps && break || true
 done
 
-kubeadm config images pull --config /etc/kubernetes/kubeadm.yml
-
 join=""
 ips=$(dig ${domain} +short A)
 for ip in $ips ; do

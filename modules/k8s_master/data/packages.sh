@@ -43,6 +43,8 @@ sudo yum install -y docker-ce docker-ce-cli containerd.io \
                     ceph-common wget perf wireshark tcpdump httping sysstat \
                     ipvsadm perf tmux vim bind-utils
 
+# Doc: https://kubernetes.io/docs/setup/cri/
+# Known issue: https://github.com/kubernetes/kubernetes/issues/71887
 # Docker config
 sudo mkdir -p /etc/docker
 cat  <<EOF | sudo tee /etc/docker/daemon.json
