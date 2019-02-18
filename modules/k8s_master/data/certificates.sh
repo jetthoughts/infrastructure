@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 
+echo "certificates.sh"
 set -x
 
 # Check that we have certificates

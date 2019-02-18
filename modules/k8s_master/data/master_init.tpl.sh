@@ -33,7 +33,7 @@ else
   kubeadm init phase certs all --config /etc/kubernetes/kubeadm.yml
 
   ## ETCD local hacks
-  # export ETCDCTL_ENDPOINTS="${etcd_endpoints}"
+  # export ETCDCTL_ENDPOINTS="$ etcd_endpoints "
 
   # kubeadm init phase certs all --config /etc/kubernetes/kubeadm.yml
 

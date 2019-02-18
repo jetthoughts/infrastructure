@@ -2,8 +2,8 @@
 
 set -xe
 
-cluster="staging"
-region="ap-northeast-1"
+readonly cluster="staging"
+readonly region="ap-northeast-1"
 
 # terraform init
 
@@ -14,7 +14,6 @@ aws ec2 describe-instances --region $region \
 
 terraform apply -target=aws_key_pair.k8s
 
-echo "Destroy old masters..."
 terraform taint -module=k8s_master aws_instance.masters
 
 echo "Generate new certificates..."
@@ -25,7 +24,7 @@ terraform taint -module=k8s_master.certificates null_resource.extract_admin_key 
 terraform apply -target=module.k8s_master.module.certificates.null_resource.generate_pki -target=module.k8s_master.module.certificates.null_resource.extract_admin_key
 
 echo "Build new master..."
-terraform apply -target=module.k8s_master.null_resource.bootstrap_public
+terraform apply -auto-approve -target=module.k8s_master.null_resource.bootstrap_public
 
 aws ec2 describe-instances --region $region \
                            --filters 'Name=tag-key,Values=Cluster' "Name=tag-value,Values=${cluster}" 'Name=instance-state-name,Values=running' \
@@ -33,14 +32,14 @@ aws ec2 describe-instances --region $region \
                            --output table
 
 echo "Update domain name for new master ips..."
-terraform apply -target=module.k8s_master.aws_route53_record.api
+terraform apply -auto-approve -target=module.k8s_master.aws_route53_record.api
 
 echo "Check master nodes"
 readonly domain=$(terraform output domain)
-sed -i 's/server: https:\/\/.*:6443/server: https:\/\/'$domain':6443/' ./assets/$cluster/admin.conf
-sed -i 's/server: https:\/\/.*:6443/server: https:\/\/'$domain':6443/' ./assets/$cluster/user.conf
+sed -i .bak 's/server: https:\/\/.*:6443/server: https:\/\/'$domain':6443/' "./assets/$cluster/admin.conf"
+sed -i .bak 's/server: https:\/\/.*:6443/server: https:\/\/'$domain':6443/' "./assets/$cluster/user.conf"
 
-kubectl --kubeconfig ./assets/staging/admin.conf get no -o wide
+kubectl --kubeconfig ./assets/$cluster/admin.conf get no -o wide
 
 exit 1
 

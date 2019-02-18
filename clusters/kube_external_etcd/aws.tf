@@ -30,4 +30,7 @@ locals {
   subnet_id         = "${var.subnet_id == "" ? element(concat(aws_subnet.public_1a.*.id, list("")), 0) : var.subnet_id}"
 
   vpc_id = "${var.vpc_id == "" ? element(concat(aws_vpc.kubernetes.*.id, list("")), 0) : var.vpc_id}"
+
+  master_security_groups = "${compact( concat ( list(aws_security_group.k8s_base.id, aws_security_group.k8s_master.id), var.master_security_groups ) ) }"
+  node_security_groups = "${compact( concat ( list(aws_security_group.k8s_base.id, aws_security_group.k8s_master.id), var.node_security_groups ) ) }"
 }

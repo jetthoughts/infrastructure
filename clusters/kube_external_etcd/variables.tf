@@ -67,3 +67,13 @@ variable "subnet_id" {
   description = "Existing subnet id of your vpc"
   default     = ""
 }
+
+variable "master_security_groups" {
+  description = "Additional security groups for master instances."
+  default = []
+}
+
+variable "node_security_groups" {
+  description = "Additional security group for node instances."
+  default = []
+}

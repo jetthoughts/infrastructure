@@ -44,7 +44,7 @@ sudo yum install -y docker-ce docker-ce-cli containerd.io \
                     ipvsadm perf tmux vim bind-utils
 
 # Docker config
-sudo mkdir /etc/docker
+sudo mkdir -p /etc/docker
 cat  <<EOF | sudo tee /etc/docker/daemon.json
 {
   "exec-opts": ["native.cgroupdriver=systemd"],

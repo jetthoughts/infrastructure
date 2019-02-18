@@ -11,10 +11,7 @@ module "k8s_master" {
   subnet_id         = "${local.subnet_id}"
   image_id          = "${local.ami_id}"
 
-  security_groups = [
-    "${aws_security_group.k8s_base.id}",
-    "${aws_security_group.k8s_master.id}",
-  ]
+  security_groups = "${local.master_security_groups}"
 
   version                = "${var.version}"
   kube_version           = "${var.kube_version}"

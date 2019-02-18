@@ -1,7 +1,7 @@
 resource "aws_security_group" "k8s_base" {
   description = "Managed by Terraform."
   vpc_id      = "${local.vpc_id}"
-  name        = "k8s-${var.cluster}-base"
+  name        = "k8s_${var.cluster}_base"
 
   ingress {
     from_port = 22
@@ -48,17 +48,18 @@ resource "aws_security_group" "k8s_base" {
   }
 
   tags {
-    Name      = "k8s-${var.cluster}-base"
+    Name      = "k8s_${var.cluster}_base"
     Cluster   = "${var.cluster}"
     Version   = "${var.version}"
     Terraform = "true"
+    Role      = "k8s"
   }
 }
 
 resource "aws_security_group" "k8s_master" {
   description = "Managed by Terraform."
   vpc_id      = "${local.vpc_id}"
-  name        = "k8s-${var.cluster}-master"
+  name        = "k8s_${var.cluster}_master"
 
   ingress {
     from_port = 6443
@@ -71,15 +72,6 @@ resource "aws_security_group" "k8s_master" {
     ]
 
     description = "kube-api-server: Send requests to api server from kubectl. Managed by Terraform."
-  }
-
-  ingress {
-    from_port = 2379
-    to_port   = 2380
-    protocol  = "tcp"
-    self      = true
-
-    description = "etcd: Configure etcd cluster. Managed by Terraform."
   }
 
   egress {
@@ -96,17 +88,18 @@ resource "aws_security_group" "k8s_master" {
   }
 
   tags {
-    Name      = "k8s-${var.cluster}-master"
+    Name      = "k8s_${var.cluster}_master"
     Cluster   = "${var.cluster}"
     Version   = "${var.version}"
     Terraform = "true"
+    Role      = "k8s"
   }
 }
 
 resource "aws_security_group" "k8s_nodes" {
   description = "K8s nodes. Managed by Terraform."
   vpc_id      = "${local.vpc_id}"
-  name        = "k8s-${var.cluster}-node"
+  name        = "k8s_${var.cluster}_node"
 
   # // https://kubernetes.io/docs/admin/kubelet/
   # // https://kubernetes.io/docs/setup/independent/install-kubeadm/
@@ -145,9 +138,10 @@ resource "aws_security_group" "k8s_nodes" {
   # }
 
   tags {
-    Name      = "k8s-${var.cluster}-node"
+    Name      = "k8s_${var.cluster}_node"
     Cluster   = "${var.cluster}"
     Version   = "${var.version}"
     Terraform = "true"
+    Role      = "k8s"
   }
 }
