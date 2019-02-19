@@ -28,19 +28,23 @@ module "k8s_master" {
   admin_email  = "${var.admin_email}"
 
   etcd_endpoints   = "${var.etcd_endpoints}"
-  etcd_prefix      = "/staging"
+  etcd_prefix      = "/${var.cluster}"
   certs_path       = "${path.module}/assets/${var.cluster}"
   master_addresses = "${var.master_addresses}"
   cert_sans        = "${var.cert_sans}"
 
   # Calico
-  pod_network_cidr = "192.168.0.0/16"
+  pod_network_cidr     = "192.168.0.0/16"
+  service_network_cidr = "10.96.0.0/12"
+
   cni_install_script = <<EOF
-kubectl apply -f https://docs.projectcalico.org/v3.5/getting-started/kubernetes/installation/hosted/etcd.yaml
-kubectl apply -f https://docs.projectcalico.org/v3.5/getting-started/kubernetes/installation/hosted/calico.yaml
+kubectl apply -f https://docs.projectcalico.org/v3.5/getting-started/kubernetes/installation/hosted/kubernetes-datastore/calico-networking/1.7/calico.yaml
+
+kubectl -n kube-system get po,no -o wide
   EOF
+
   tags = {
-    Role      = "master"
+    Role      = "kube_master"
     Terraform = "true"
     Cluster   = "${var.cluster}"
     Version   = "${var.version}"

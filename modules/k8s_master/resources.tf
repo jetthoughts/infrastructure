@@ -16,17 +16,16 @@ resource "aws_instance" "masters" {
     "aws_iam_role_policy.masters",
   ]
 
-  ami           = "${var.image_id}"
-  instance_type = "${var.instance_type}"
-
-  key_name             = "${var.ssh_key_name}"
-  iam_instance_profile = "${aws_iam_instance_profile.masters.id}"
-  monitoring           = false
-
   vpc_security_group_ids = [
     "${var.security_groups}",
   ]
 
+  ami                     = "${var.image_id}"
+  instance_type           = "${var.instance_type}"
+  key_name                = "${var.ssh_key_name}"
+  iam_instance_profile    = "${aws_iam_instance_profile.masters.id}"
+  monitoring              = false
+  ebs_optimized           = true
   availability_zone       = "${var.availability_zone}"
   subnet_id               = "${var.subnet_id}"
   private_ip              = "${element(var.master_addresses, count.index)}"
@@ -238,6 +237,7 @@ data "template_file" "master_init" {
     kube_version            = "${var.kube_version}"
     domain                  = "${local.internal_domain}"
     kubeadm_bootstrap_token = "${var.bootstrap_token}"
+
     # etcd_endpoints          = "${join(":2379,", var.master_addresses)}:2379"
   }
 }

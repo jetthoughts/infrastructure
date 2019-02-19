@@ -26,7 +26,7 @@ nodeRegistration:
   name: $PRIVATE_HOSTNAME
   kubeletExtraArgs:
     cgroup-driver: systemd
-    cloud-provider: external
+
 ---
 apiVersion: kubelet.config.k8s.io/v1beta1
 kind: KubeletConfiguration
@@ -40,6 +40,18 @@ evictionHard:
   memory.available: 100Mi
   nodefs.available: 10%
   nodefs.inodesFree: 5%
+
+---
+apiVersion: kubeproxy.config.k8s.io/v1alpha1
+kind: KubeProxyConfiguration
+
+mode: ipvs
+conntrack:
+  max: null
+  maxPerCore: 1048576
+  min: 524288
+  tcpCloseWaitTimeout: 0h0m30s
+  tcpEstablishedTimeout: 24h0m0s
 
 ---
 apiVersion: kubeadm.k8s.io/v1beta1
@@ -122,16 +134,4 @@ kubeProxy:
       min: 524288
       tcpCloseWaitTimeout: 0h10m0s
       tcpEstablishedTimeout: 1h0m0s
-
----
-# https://godoc.org/k8s.io/kubelet/config/v1beta1#KubeletConfiguration
-apiVersion: kubelet.config.k8s.io/v1beta1
-kind: KubeletConfiguration
-evictionHard:
-    memory.available:  "300Mi"
-cloudProvider: aws
-cgroupDriver: systemd
-runtimeCgroups: /systemd/system.slice
-kubeletCgroups: /systemd/system.slice
-
 EOF

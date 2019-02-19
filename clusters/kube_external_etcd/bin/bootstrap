@@ -4,7 +4,7 @@ set -xe
 
 readonly cluster="staging"
 readonly region="ap-northeast-1"
-
+readonly etc_ip="10.128.0.11"
 # terraform init
 
 aws ec2 describe-instances --region $region \
@@ -14,19 +14,25 @@ aws ec2 describe-instances --region $region \
 
 terraform apply -target=aws_key_pair.k8s
 
-terraform taint -module=k8s_master aws_instance.masters
+echo "Destroy old cluster..."
+terraform destroy -auto-approve -target=module.k8s_master.aws_instance.masters
+ssh -t $etc_ip 'ETCDCTL_API=3 etcdctl del --prefix /'$cluster
 
 echo "Generate new certificates..."
 
 rm -fr ./assets/${cluster}
 terraform taint -module=k8s_master.certificates null_resource.generate_pki || true
 terraform taint -module=k8s_master.certificates null_resource.extract_admin_key  || true
-terraform apply -target=module.k8s_master.module.certificates.null_resource.generate_pki -target=module.k8s_master.module.certificates.null_resource.extract_admin_key
+terraform apply -auto-approve \
+            -target=module.k8s_master.module.certificates.null_resource.generate_pki \
+            -target=module.k8s_master.module.certificates.null_resource.extract_admin_key
 
 echo "Build new master..."
-terraform apply -auto-approve -target=module.k8s_master.null_resource.bootstrap_public
+terraform apply \
+            -target="module.k8s_master.aws_instance.masters[0]" \
+            -target="module.k8s_master.null_resource.bootstrap_public[0]"
 
-aws ec2 describe-instances --region $region \
+aws ec2 describe-instances --region "$region" \
                            --filters 'Name=tag-key,Values=Cluster' "Name=tag-value,Values=${cluster}" 'Name=instance-state-name,Values=running' \
                            --query "Reservations[*].Instances[*].[PrivateDnsName,Tags[?Key=='Role']| [0].Value]" \
                            --output table
@@ -40,6 +46,8 @@ sed -i .bak 's/server: https:\/\/.*:6443/server: https:\/\/'$domain':6443/' "./a
 sed -i .bak 's/server: https:\/\/.*:6443/server: https:\/\/'$domain':6443/' "./assets/$cluster/user.conf"
 
 kubectl --kubeconfig ./assets/$cluster/admin.conf get no -o wide
+
+terraform apply -target="module.k8s_master.null_resource.bootstrap_public"
 
 exit 1
 

@@ -3,18 +3,18 @@ resource "aws_security_group" "k8s_base" {
   vpc_id      = "${local.vpc_id}"
   name        = "k8s_${var.cluster}_base"
 
-  # ingress {
-  #   from_port = 22
-  #   to_port   = 22
-  #   protocol  = "tcp"
-  #   self      = false
+  ingress {
+    from_port = 22
+    to_port   = 22
+    protocol  = "tcp"
+    self      = false
 
-  #   cidr_blocks = [
-  #     "0.0.0.0/0",
-  #   ]
+    cidr_blocks = [
+      "0.0.0.0/0",
+    ]
 
-  #   description = "ssh: Access to the node. Managed by Terraform."
-  # }
+    description = "ssh: Access to the node. Managed by Terraform."
+  }
 
   ingress {
     from_port = 179
@@ -84,10 +84,10 @@ resource "aws_security_group" "k8s_master" {
   }
 
   ingress {
-    from_port = 6666
-    to_port   = 6667
-    protocol  = "tcp"
-    self      = true
+    from_port   = 6666
+    to_port     = 6667
+    protocol    = "tcp"
+    self        = true
     description = "calico-etcd: Calico datastore. Managed by Terraform."
   }
 
@@ -136,6 +136,7 @@ resource "aws_security_group" "k8s_nodes" {
   #   self      = true
   # }
 
+
   # //  flannel
   # ingress {
   #   from_port = 8472
@@ -155,8 +156,6 @@ resource "aws_security_group" "k8s_nodes" {
 
     description = "kubelet: Allow access to kubelet from master. Managed by Terraform."
   }
-
-
   tags {
     Name      = "k8s_${var.cluster}_node"
     Cluster   = "${var.cluster}"

@@ -19,13 +19,13 @@ variable "admin_email" {
 
 variable "version" {
   description = "Mark resources with specific version to find which resources should be upgraded."
-  default = "v20190217"
+  default     = "v20190219"
 }
 
 variable "google_oauth_client_id" {}
 
 variable "kubeadm_bootstrap_token" {
-  description = "Kubeadm token for adding new nodes. docker run --rm -it miry/kubernetes:v1.14.0-alpha.2  kubeadm token generate"
+  description = "Kubeadm token for adding new nodes. docker run --rm -it miry/kubernetes:v1.14.0-alpha.3  kubeadm token generate"
 }
 
 variable "kube_version" {
@@ -70,10 +70,10 @@ variable "subnet_id" {
 
 variable "master_security_groups" {
   description = "Additional security groups for master instances."
-  default = []
+  default     = []
 }
 
 variable "node_security_groups" {
   description = "Additional security group for node instances."
-  default = []
+  default     = []
 }
