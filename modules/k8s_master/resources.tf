@@ -68,7 +68,7 @@ resource "null_resource" "bootstrap_bastion" {
 
   provisioner "file" {
     content     = "${var.pre_init_script}"
-    destination = "/tmp/terraform/00pre_init_script.sh"
+    destination = "/tmp/terraform/pre_init_script.sh"
   }
 
   provisioner "file" {
@@ -117,23 +117,9 @@ resource "null_resource" "bootstrap_bastion" {
   }
 
   provisioner "remote-exec" {
-    inline = [
-      "set -e",
-      "chmod +x /tmp/terraform/*.sh",
-      "sudo /tmp/terraform/00pre_init_script.sh",
-      "sudo /tmp/terraform/packages.sh",
-      "sudo /tmp/terraform/kube_packages.sh",
-
-      # "sudo /tmp/terraform/k8s_kubelet_extra_args.sh",
-      "sudo /tmp/terraform/certificates.sh",
-    ]
-
-    #     "sudo /tmp/terraform/kubeadm_config.sh",
-    #     "sudo /tmp/terraform/master.sh || exit",
-    #     "sudo /tmp/terraform/cni.sh",
-    #     "sudo /tmp/terraform/admin.sh",
-    #     "sudo shutdown -r +1",
+    script = "${path.module}/data/execute.sh"
   }
+
 }
 
 resource "null_resource" "bootstrap_public" {
@@ -211,22 +197,7 @@ resource "null_resource" "bootstrap_public" {
   }
 
   provisioner "remote-exec" {
-    inline = [
-      "set -e",
-      "chmod +x /tmp/terraform/*.sh",
-      "sudo /tmp/terraform/pre_init_script.sh",
-      "sudo /tmp/terraform/packages.sh",
-      "sudo /tmp/terraform/kube_packages.sh",
-
-      # "sudo /tmp/terraform/k8s_kubelet_extra_args.sh",
-      "sudo /tmp/terraform/certificates.sh",
-
-      "sudo /tmp/terraform/kubeadm_config.sh",
-      "sudo /tmp/terraform/master.sh || exit",
-      "sudo /tmp/terraform/cni.sh",
-      "sudo /tmp/terraform/admin.sh || true",
-      "sudo shutdown -r +1",
-    ]
+    script = "${path.module}/data/execute.sh"
   }
 }
 
