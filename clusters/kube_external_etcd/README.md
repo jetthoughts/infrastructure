@@ -35,3 +35,11 @@ $ kubectl --kubeconfig ./assets/staging/admin.conf get no -o wide
 ```
 
 Where `staging` is the cluster name.
+
+# Clean
+
+Remove all AWS resources and clean ETCD prefix.
+
+```shell
+$ ./bin/clean
+```

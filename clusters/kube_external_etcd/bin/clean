@@ -1,0 +1,44 @@
+#!/usr/bin/env bash
+
+readonly bold=$(tput bold)
+readonly red=$(tput setaf 1)
+readonly green=$(tput setaf 148)
+readonly normal=$(tput sgr0)
+
+set -xe
+
+readonly cluster="staging"
+readonly region="ap-northeast-1"
+readonly etc_ip="10.128.0.11"
+
+aws ec2 describe-instances --region $region \
+                           --filters 'Name=tag-key,Values=Cluster' "Name=tag-value,Values=${cluster}" 'Name=instance-state-name,Values=running' \
+                           --query "Reservations[*].Instances[*].[PrivateDnsName,Tags[?Key=='Role']| [0].Value]" \
+                           --output table
+
+echo "${bold}${green}Destroing old cluster...${normal}"
+terraform destroy -auto-approve \
+            -target=module.k8s_master.aws_instance.masters \
+            -target=module.k8s_node.aws_autoscaling_group.node \
+            -target=module.k8s_node.aws_launch_configuration.node \
+            -target=module.k8s_node.aws_autoscaling_group.node \
+            -target=module.k8s_node.aws_launch_configuration.node \
+            -target=module.k8s_master.aws_route53_record.api \
+            -target=module.k8s_master.aws_iam_instance_profile.masters \
+            -target=module.k8s_master.aws_iam_role.masters \
+            -target=module.k8s_master.aws_iam_role_policy.masters \
+            -target=module.k8s_master.aws_route53_record.api \
+            -target=module.k8s_master.aws_route53_record.internal \
+            -target=module.k8s_master.module.certificates.null_resource.extract_admin_key \
+            -target=module.k8s_master.module.certificates.null_resource.generate_pki \
+            -target=module.k8s_node.aws_iam_instance_profile.nodes \
+            -target=module.k8s_node.aws_iam_role.nodes \
+            -target=module.k8s_node.aws_iam_role_policy.nodes \
+            -target=module.k8s_node.aws_launch_configuration.node \
+            -target=aws_key_pair.k8s \
+            -target=aws_security_group.k8s_base \
+            -target=aws_security_group.k8s_master \
+            -target=aws_security_group.k8s_node
+
+ssh -t $etc_ip 'ETCDCTL_API=3 etcdctl del --prefix /'$cluster
+rm -fr ./assets/${cluster}
