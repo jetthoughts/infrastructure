@@ -113,7 +113,7 @@ resource "aws_security_group" "k8s_master" {
   }
 }
 
-resource "aws_security_group" "k8s_nodes" {
+resource "aws_security_group" "k8s_node" {
   description = "K8s nodes. Managed by Terraform."
   vpc_id      = "${local.vpc_id}"
   name        = "k8s_${var.cluster}_node"
@@ -161,6 +161,6 @@ resource "aws_security_group" "k8s_nodes" {
     Cluster   = "${var.cluster}"
     Version   = "${var.version}"
     Terraform = "true"
-    Role      = "k8s"
+    Role      = "kube_node"
   }
 }

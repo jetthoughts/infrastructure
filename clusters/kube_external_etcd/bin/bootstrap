@@ -45,6 +45,12 @@ readonly domain=$(terraform output domain)
 sed -i .bak 's/server: https:\/\/.*:6443/server: https:\/\/'$domain':6443/' "./assets/$cluster/admin.conf"
 sed -i .bak 's/server: https:\/\/.*:6443/server: https:\/\/'$domain':6443/' "./assets/$cluster/user.conf"
 
+for i in `seq 5 1`
+do
+  sleep $[ $i * 10 ]
+  curl -f -k https://$domain:6443/healthz --retry 3 --retry-delay 1 && break || true
+done
+
 kubectl --kubeconfig ./assets/$cluster/admin.conf get no -o wide
 
 terraform apply -target="module.k8s_master.null_resource.bootstrap_public"

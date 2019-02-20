@@ -102,3 +102,8 @@ variable "root_volume_size" {
   description = "Set root volume disk size"
   default     = "20"
 }
+
+variable "ebs_optimized" {
+  description = "Enable EBS optimized for instances"
+  default     = true
+}

@@ -2,15 +2,15 @@ data "template_file" "node_join" {
   template = "${file("${path.module}/data/node_join.tpl.sh")}"
 
   vars {
-    kube_version = "${var.kube_version}"
-    bootstrap_token   = "${var.bootstrap_token}"
-    master_ip    = "${var.master_ip}"
-    node_labels  = "${join(" ", var.node_labels)}"
+    kube_version    = "${var.kube_version}"
+    bootstrap_token = "${var.bootstrap_token}"
+    master_ip       = "${var.master_ip}"
+    node_labels     = "${join(" ", var.node_labels)}"
   }
 }
 
-data "template_file" "kube_args" {
-  template = "${file("${path.module}/data/k8s_kubelet_extra_args.tpl.sh")}"
+data "template_file" "kubelet_extra_args" {
+  template = "${file("${path.module}/data/kubelet_extra_args.tpl.sh")}"
 
   vars {
     node_labels        = "${join(",", var.node_labels)}"
@@ -41,11 +41,11 @@ data "template_cloudinit_config" "node_init" {
     content      = "${data.template_file.kube_packages.rendered}"
   }
 
-  part {
-    filename     = "08kube_args.sh"
-    content_type = "text/x-shellscript"
-    content      = "${data.template_file.kube_args.rendered}"
-  }
+  # part {
+  #   filename     = "08kubelet_extra_args.sh"
+  #   content_type = "text/x-shellscript"
+  #   content      = "${data.template_file.kubelet_extra_args.rendered}"
+  # }
 
   part {
     filename     = "10node.sh"
@@ -62,7 +62,7 @@ data "template_cloudinit_config" "node_init" {
 
 resource "aws_launch_configuration" "node" {
   depends_on           = ["aws_iam_role_policy.nodes"]
-  name_prefix          = "k8s-${var.name}-${var.kube_version}-node-"
+  name_prefix          = "k8s_${var.name}_${var.kube_version}_node_"
   image_id             = "${var.image_id}"
   user_data            = "${data.template_cloudinit_config.node_init.rendered}"
   instance_type        = "${var.instance_type}"
