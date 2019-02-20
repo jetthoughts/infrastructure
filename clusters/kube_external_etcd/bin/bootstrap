@@ -1,11 +1,17 @@
 #!/usr/bin/env bash
 
+readonly bold=$(tput bold)
+readonly red=$(tput setaf 1)
+readonly green=$(tput setaf 148)
+readonly normal=$(tput sgr0)
+
 set -xe
 
 readonly cluster="staging"
 readonly region="ap-northeast-1"
 readonly etc_ip="10.128.0.11"
-# terraform init
+
+terraform init
 
 aws ec2 describe-instances --region $region \
                            --filters 'Name=tag-key,Values=Cluster' "Name=tag-value,Values=${cluster}" 'Name=instance-state-name,Values=running' \
@@ -14,12 +20,11 @@ aws ec2 describe-instances --region $region \
 
 terraform apply -target=aws_key_pair.k8s
 
-echo "Destroy old cluster..."
-terraform destroy -auto-approve -target=module.k8s_master.aws_instance.masters
+echo "${bold}${green}Destroing old cluster...${normal}"
+terraform destroy -auto-approve -target=module.k8s_master.aws_instance.masters -target=module.k8s_node.aws_autoscaling_group.node -target=module.k8s_node.aws_launch_configuration.node
 ssh -t $etc_ip 'ETCDCTL_API=3 etcdctl del --prefix /'$cluster
 
-echo "Generate new certificates..."
-
+echo "${bold}${green}Generating TLS certificates...${normal}"
 rm -fr ./assets/${cluster}
 terraform taint -module=k8s_master.certificates null_resource.generate_pki || true
 terraform taint -module=k8s_master.certificates null_resource.extract_admin_key  || true
@@ -27,8 +32,8 @@ terraform apply -auto-approve \
             -target=module.k8s_master.module.certificates.null_resource.generate_pki \
             -target=module.k8s_master.module.certificates.null_resource.extract_admin_key
 
-echo "Build new master..."
-terraform apply \
+echo "${bold}${green}Initializing first master...${normal}"
+terraform apply -auto-approve \
             -target="module.k8s_master.aws_instance.masters[0]" \
             -target="module.k8s_master.null_resource.bootstrap_public[0]"
 
@@ -37,10 +42,10 @@ aws ec2 describe-instances --region "$region" \
                            --query "Reservations[*].Instances[*].[PrivateDnsName,Tags[?Key=='Role']| [0].Value]" \
                            --output table
 
-echo "Update domain name for new master ips..."
+echo "${bold}${green}Updating domain name for new master ips...${normal}"
 terraform apply -auto-approve -target=module.k8s_master.aws_route53_record.api
 
-echo "Check master nodes"
+echo "${bold}${green}Check master nodes...${normal}"
 readonly domain=$(terraform output domain)
 sed -i .bak 's/server: https:\/\/.*:6443/server: https:\/\/'$domain':6443/' "./assets/$cluster/admin.conf"
 sed -i .bak 's/server: https:\/\/.*:6443/server: https:\/\/'$domain':6443/' "./assets/$cluster/user.conf"
@@ -53,16 +58,10 @@ done
 
 kubectl --kubeconfig ./assets/$cluster/admin.conf get no -o wide
 
-terraform apply -target="module.k8s_master.null_resource.bootstrap_public"
+echo "${bold}${green}Initializing other masters...${normal}"
+terraform apply -auto-approve -target=module.k8s_master.null_resource.bootstrap_public
 
-exit 1
+echo "${bold}${green}Initializing slaves...${normal}"
+terraform apply -auto-approve -target=module.k8s_node.aws_autoscaling_group.node -target=module.k8s_node.aws_launch_configuration.node
 
-echo "Rebuilding slaves..."
-terraform apply -target=module.k8s_node.aws_autoscaling_group.node -target=module.k8s_node.aws_launch_configuration.node
-
-echo "Destroy old slaves..."
-for i in $(aws ec2 describe-instances --region $region --filters 'Name=tag-key,Values=Cluster' "Name=tag-value,Values=${cluster}" 'Name=tag-key,Values=Role' "Name=tag-value,Values=k8s-node" 'Name=instance-state-name,Values=running' --query 'Reservations[].Instances[].InstanceId' --output text)
-do
-    echo $i
-    aws ec2 terminate-instances --instance-ids $i
-done
+kubectl --kubeconfig ./assets/$cluster/admin.conf get no -o wide
