@@ -52,7 +52,6 @@ data "template_cloudinit_config" "node_init" {
     content_type = "text/x-shellscript"
     content      = "${data.template_file.node_join.rendered}"
   }
-
   part {
     filename     = "99reboot.sh"
     content_type = "text/x-shellscript"

@@ -44,6 +44,10 @@ resource "aws_security_group" "k8s_base" {
       "0.0.0.0/0",
     ]
 
+    ipv6_cidr_blocks = [
+      "::/0",
+    ]
+
     description = "Managed by Terraform."
   }
 
