@@ -3,17 +3,17 @@ module "k8s_master" {
     aws = "aws"
   }
 
-  source            = "../../modules/k8s_master"
-  name              = "${var.cluster}"
+  source = "../../modules/k8s_master"
+  name   = "${var.cluster}"
+
   instance_type     = "c5.large"
   spot_price        = "0.1"
   availability_zone = "${local.availability_zone}"
   subnet_id         = "${local.subnet_id}"
   image_id          = "${local.ami_id}"
+  security_groups   = "${local.master_security_groups}"
+  ssh_key_name      = "${aws_key_pair.k8s.key_name}"
 
-  security_groups = "${local.master_security_groups}"
-
-  version                = "${var.version}"
   kube_version           = "${var.kube_version}"
   bootstrap_token        = "${var.kubeadm_bootstrap_token}"
   google_oauth_client_id = "${var.google_oauth_client_id}"
@@ -23,9 +23,9 @@ module "k8s_master" {
   dns_primary_domain = "${var.domain}"
 
   # bastion          = "${var.bastion}"
-  asset_path   = "./assets"
-  ssh_key_name = "${aws_key_pair.k8s.key_name}"
-  admin_email  = "${var.admin_email}"
+  asset_path = "./assets"
+
+  admin_email = "${var.admin_email}"
 
   etcd_endpoints   = "${var.etcd_endpoints}"
   etcd_prefix      = "/${var.cluster}"
