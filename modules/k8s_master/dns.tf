@@ -13,5 +13,5 @@ resource "aws_route53_record" "internal" {
   name    = "${local.internal_domain}"
   type    = "A"
   ttl     = "${var.dns_ttl}"
-  records = "${var.master_addresses}"
+  records = ["${var.master_addresses}"]
 }
