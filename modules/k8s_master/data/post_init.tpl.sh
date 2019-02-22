@@ -2,8 +2,8 @@
 
 set -xeuo pipefail
 
-echo "cni.tpl.sh"
+echo "post_init.tpl.sh"
 
-echo "Installing CNI addon"
+echo "Run post master init script"
 export KUBECONFIG=/etc/kubernetes/admin.conf
-${cni_install_script}
+${post_init_script}

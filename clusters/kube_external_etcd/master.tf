@@ -7,7 +7,6 @@ module "k8s_master" {
   name   = "${var.cluster}"
 
   instance_type     = "c5.large"
-  spot_price        = "0.1"
   availability_zone = "${local.availability_zone}"
   subnet_id         = "${local.subnet_id}"
   image_id          = "${local.ami_id}"
@@ -37,10 +36,13 @@ module "k8s_master" {
   pod_network_cidr     = "192.168.0.0/16"
   service_network_cidr = "10.96.0.0/12"
 
-  cni_install_script = <<EOF
+  post_init_script = <<EOF
 kubectl apply -f https://docs.projectcalico.org/v3.5/getting-started/kubernetes/installation/hosted/kubernetes-datastore/calico-networking/1.7/calico.yaml
 
 kubectl -n kube-system get po,no -o wide
+
+kubectl create clusterrolebinding cluster-admin-user --clusterrole=cluster-admin --user=miry.sof@gmail.com || true
+kubectl create clusterrolebinding admin-user --clusterrole=admin --user=miry.sof@gmail.com || true
   EOF
 
   tags = {

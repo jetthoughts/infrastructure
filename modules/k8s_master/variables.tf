@@ -140,9 +140,8 @@ variable "pre_init_script" {
   EOF
 }
 
-variable "cni_install_script" {
+variable "post_init_script" {
   default = <<EOF
-kubectl apply -f https://docs.projectcalico.org/v3.5/getting-started/kubernetes/installation/hosted/etcd.yaml
-kubectl apply -f https://docs.projectcalico.org/v3.5/getting-started/kubernetes/installation/hosted/calico.yaml
+kubectl apply -f https://docs.projectcalico.org/v3.5/getting-started/kubernetes/installation/hosted/kubernetes-datastore/calico-networking/1.7/calico.yaml
   EOF
 }

@@ -11,6 +11,6 @@ sudo /tmp/terraform/kube_packages.sh
 sudo /tmp/terraform/certificates.sh
 sudo /tmp/terraform/kubeadm_config.sh
 sudo /tmp/terraform/master.sh || exit
-sudo /tmp/terraform/cni.sh
+sudo /tmp/terraform/post_init.sh
 sudo /tmp/terraform/admin.sh || true
 sudo shutdown -r +1

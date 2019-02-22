@@ -108,8 +108,8 @@ resource "null_resource" "bootstrap_bastion" {
   }
 
   provisioner "file" {
-    content     = "${data.template_file.cni.rendered}"
-    destination = "/tmp/terraform/cni.sh"
+    content     = "${data.template_file.post_init.rendered}"
+    destination = "/tmp/terraform/post_init.sh"
   }
 
   provisioner "file" {
@@ -187,8 +187,8 @@ resource "null_resource" "bootstrap_public" {
   }
 
   provisioner "file" {
-    content     = "${data.template_file.cni.rendered}"
-    destination = "/tmp/terraform/cni.sh"
+    content     = "${data.template_file.post_init.rendered}"
+    destination = "/tmp/terraform/post_init.sh"
   }
 
   provisioner "file" {
@@ -256,10 +256,10 @@ data "template_file" "admin" {
   }
 }
 
-data "template_file" "cni" {
-  template = "${file("${path.module}/data/cni.tpl.sh")}"
+data "template_file" "post_init" {
+  template = "${file("${path.module}/data/post_init.tpl.sh")}"
 
   vars {
-    cni_install_script = "${var.cni_install_script}"
+    post_init_script = "${var.post_init_script}"
   }
 }
