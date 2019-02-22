@@ -98,14 +98,14 @@ data "template_file" "master_init" {
   template = "${file("${path.module}/data/master_init.tpl.sh")}"
 
   vars {
-    kubeadm_bootstrap_token              = "${var.k8s_token}"
-    k8s_version            = "${var.k8s_version}"
-    k8s_pod_network_cidr   = "${var.k8s_pod_network_cidr}"
-    domain                 = "${var.domain}"
-    google_oauth_client_id = "${var.google_oauth_client_id}"
-    ca_crt                 = "${var.k8s_ca_crt}"
-    master_ips             = "${join("\" \"", var.master_addresses)}"
-    etcd_endpoints         = "${join("\" \"", var.etcd_endpoints)}"
+    kubeadm_bootstrap_token = "${var.k8s_token}"
+    k8s_version             = "${var.k8s_version}"
+    k8s_pod_network_cidr    = "${var.k8s_pod_network_cidr}"
+    domain                  = "${var.domain}"
+    google_oauth_client_id  = "${var.google_oauth_client_id}"
+    ca_crt                  = "${var.k8s_ca_crt}"
+    master_ips              = "${join("\" \"", var.master_addresses)}"
+    etcd_endpoints          = "${join("\" \"", var.etcd_endpoints)}"
   }
 }
 

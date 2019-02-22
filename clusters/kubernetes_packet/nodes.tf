@@ -2,12 +2,11 @@ locals {
   master_private_address = "${packet_device.masters.0.network.2.address}"
 }
 
-
 resource "packet_device" "nodes" {
-  count = "${var.nodes_count}"
-  hostname = "node${count.index}"
+  count         = "${var.nodes_count}"
+  hostname      = "node${count.index}"
   billing_cycle = "hourly"
-  project_id = "${packet_project.k8s_dev.id}"
+  project_id    = "${packet_project.k8s_dev.id}"
 
   // https://www.packet.net/developers/api/facilities/
   facility = "ewr1"
@@ -43,7 +42,8 @@ resource "packet_device" "nodes" {
 
   provisioner "file" {
     destination = "/tmp/terraform/pre_init_script.sh"
-    content      = <<EOF
+
+    content = <<EOF
       set -x
       "${var.pre_init_script}"
   EOF
@@ -60,7 +60,7 @@ resource "packet_device" "nodes" {
   }
 
   provisioner "file" {
-    content      = "${data.template_file.node_join.rendered}"
+    content     = "${data.template_file.node_join.rendered}"
     destination = "/tmp/terraform/node.sh"
   }
 
