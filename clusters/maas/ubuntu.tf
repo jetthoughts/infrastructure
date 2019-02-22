@@ -12,12 +12,17 @@ resource "null_resource" "packages" {
   connection {
     type        = "ssh"
     user        = "ubuntu"
+<<<<<<< HEAD
     private_key = "${file(var.private_key_path)}"
+=======
+    private_key = "${file("~/.ssh/id_rsa")}"
+>>>>>>> Format example
     host        = "${var.server_ip}"
   }
 
   provisioner "remote-exec" {
     inline = [
+<<<<<<< HEAD
       "sudo apt-get update && sudo apt-get upgrade -y",
       "sudo DEBIAN_FRONTEND=noninteractive apt-get install -y iptables-persistent netfilter-persistent",
       "sudo shutdown -r +1",
@@ -44,6 +49,16 @@ resource "null_resource" "zram" {
     inline = [
       "cat /tmp/zram | sudo tee /etc/rc.local",
       "sudo bash /tmp/zram",
+=======
+      // "sudo apt-mark hold linux-raspi2 linux-image-raspi2 linux-headers-raspi2",
+      "sudo dpkg-divert --divert /lib/firmware/brcm/brcmfmac43430-sdio-2.bin --package linux-firmware-raspi2 --rename --add /lib/firmware/brcm/brcmfmac43430-sdio.bin",
+
+      "sudo apt-get update && sudo apt-get upgrade -y",
+
+      // "sudo apt-mark unhold linux-raspi2 linux-image-raspi2 linux-headers-raspi2",
+      // "sudo apt-get update && sudo apt-get upgrade -y && sudo apt-get dist-upgrade -y",
+      // "sudo sed 's/device_tree_address.*/device_tree_address=0x02008000/g; s/^.*device_tree_end.*//g;' -i /boot/firmware/config.txt",
+>>>>>>> Format example
       "sudo shutdown -r +1",
     ]
   }
@@ -56,7 +71,11 @@ resource "null_resource" "hostname" {
   connection {
     type        = "ssh"
     user        = "ubuntu"
+<<<<<<< HEAD
     private_key = "${file(var.private_key_path)}"
+=======
+    private_key = "${file("~/.ssh/id_rsa")}"
+>>>>>>> Format example
     host        = "${var.server_ip}"
   }
 
@@ -77,7 +96,11 @@ resource "null_resource" "networking" {
   connection {
     type        = "ssh"
     user        = "ubuntu"
+<<<<<<< HEAD
     private_key = "${file(var.private_key_path)}"
+=======
+    private_key = "${file("~/.ssh/id_rsa")}"
+>>>>>>> Format example
     host        = "${var.server_ip}"
   }
 
@@ -102,7 +125,11 @@ resource "null_resource" "monitoring" {
     type        = "ssh"
     user        = "ubuntu"
     host        = "${var.server_ip}"
+<<<<<<< HEAD
     private_key = "${file(var.private_key_path)}"
+=======
+    private_key = "${file("~/.ssh/id_rsa")}"
+>>>>>>> Format example
   }
 
   provisioner "remote-exec" {

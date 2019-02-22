@@ -1,3 +1,25 @@
+resource "null_resource" "zram" {
+  connection {
+    type        = "ssh"
+    user        = "ubuntu"
+    host        = "${var.server_ip}"
+    private_key = "${file("~/.ssh/id_rsa")}"
+  }
+
+  provisioner "file" {
+    source      = "data/zram"
+    destination = "/tmp/zram"
+  }
+
+  provisioner "remote-exec" {
+    inline = [
+      "cat /tmp/zram | sudo tee /etc/rc.local",
+      "sudo bash /tmp/zram",
+      "sudo shutdown -r +1",
+    ]
+  }
+}
+
 # https://github.com/madeden/blogposts/blob/master/k8s-gpu-cluster/10-install-maas.md
 # Maas Devel: https://docs.ubuntu.com/maas/devel/en/release-notes
 # https://docs.maas.io/devel/en/installconfig-package-install
@@ -8,7 +30,7 @@ resource "null_resource" "maas-packages" {
     type        = "ssh"
     user        = "ubuntu"
     host        = "${var.server_ip}"
-    private_key = "${file(var.private_key_path)}"
+    private_key = "${file("~/.ssh/id_rsa")}"
   }
 
   provisioner "remote-exec" {
@@ -25,34 +47,28 @@ resource "null_resource" "maas-packages" {
 }
 
 resource "null_resource" "maas-eth-network" {
-  depends_on = ["null_resource.networking"]
+  depends_on = ["null_resource.wifi"]
+
   connection {
     type        = "ssh"
     user        = "ubuntu"
     host        = "${var.server_ip}"
-    private_key = "${file(var.private_key_path)}"
+    private_key = "${file("~/.ssh/id_rsa")}"
   }
 
   provisioner "remote-exec" {
     inline = [
+      "sudo touch /etc/sysctl.d/99-maas.conf",
       "echo 'net.ipv4.ip_forward=1' | sudo tee /etc/sysctl.d/99-maas.conf",
-      "echo 'net.core.netdev_budget=3000' | sudo tee -a /etc/sysctl.d/99-maas.conf",
-      "echo 'net.core.netdev_budget_usecs=20000' | sudo tee -a /etc/sysctl.d/99-maas.conf",
       "sudo sh -c 'echo 1 > /proc/sys/net/ipv4/ip_forward'",
-      "sudo DEBIAN_FRONTEND=noninteractive apt-get install -y iptables-persistent netfilter-persistent",
       "sudo iptables -t nat -A POSTROUTING -o wlan0 -j MASQUERADE",
       "sudo iptables -A FORWARD -i wlan0 -o eth0 -m state --state RELATED,ESTABLISHED -j ACCEPT",
       "sudo iptables -A FORWARD -i eth0 -o wlan0 -j ACCEPT",
-
-      "sudo iptables -t nat -A POSTROUTING -o eth1 -j MASQUERADE",
-      "sudo iptables -A FORWARD -i eth1 -o eth0 -m state --state RELATED,ESTABLISHED -j ACCEPT",
-      "sudo iptables -A FORWARD -i eth0 -o eth1 -j ACCEPT",
-
-      "sudo netfilter-persistent save",
-
-      "echo \"network:\\n  version: 2\\n  ethernets:\\n    eth0:\\n      dhcp4: no\\n      addresses:\\n        - ${var.private_ip}/24\\n\" | sudo tee /etc/netplan/40-static.yaml",
-      "sudo rm /etc/netplan/50-cloud-init.yaml",
-      "sudo netplan --debug apply",
+      "sudo sh -c 'iptables-save > /etc/iptables.ipv4.nat'",
+      "echo \"allow-hotplug eth0\niface eth0 inet static\n  address ${var.private_ip}\n  netmask ${var.private_netmask}\n up iptables-restore < /etc/iptables.ipv4.nat\" | sudo tee /etc/network/interfaces.d/01-eth0.cfg",
+      "sudo rm /etc/network/interfaces.d/50-cloud-init.cfg",
+      "sudo ifdown eth0",
+      "sudo ifup eth0",
       "sudo shutdown -r +1",
     ]
   }
