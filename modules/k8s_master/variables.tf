@@ -84,11 +84,6 @@ variable "admin_email" {
   description = "Admin email"
 }
 
-variable "spot_price" {
-  description = "If empty used Demand instances"
-  default     = ""
-}
-
 variable "etcd_endpoints" {
   type        = "list"
   description = "The external etcd cluster."

@@ -30,6 +30,7 @@ resource "aws_instance" "masters" {
   subnet_id               = "${var.subnet_id}"
   private_ip              = "${element(var.master_addresses, count.index)}"
   disable_api_termination = false
+  source_dest_check       = false
 
   root_block_device = {
     volume_type           = "standard"
@@ -119,7 +120,6 @@ resource "null_resource" "bootstrap_bastion" {
   provisioner "remote-exec" {
     script = "${path.module}/data/execute.sh"
   }
-
 }
 
 resource "null_resource" "bootstrap_public" {

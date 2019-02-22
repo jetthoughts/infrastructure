@@ -57,9 +57,9 @@ conntrack:
 apiVersion: kubeadm.k8s.io/v1beta1
 kind: ClusterConfiguration
 
-# clusterName: "${name}"
+clusterName: "${name}"
 networking:
-  # serviceSubnet: "${service_network_cidr}"
+  serviceSubnet: "${service_network_cidr}"
   podSubnet: "${pod_network_cidr}"
 kubernetesVersion: ${kube_version}
 controlPlaneEndpoint: "${internal_domain}:6443"
