@@ -26,6 +26,7 @@ nodeRegistration:
   name: $PRIVATE_HOSTNAME
   kubeletExtraArgs:
     cgroup-driver: systemd
+    cloud-provider: aws
 
 ---
 apiVersion: kubelet.config.k8s.io/v1beta1
@@ -64,6 +65,11 @@ networking:
 kubernetesVersion: ${kube_version}
 controlPlaneEndpoint: "${internal_domain}:6443"
 
+controllerManager:
+  extraArgs:
+    cloud-provider: aws
+    horizontal-pod-autoscaler-cpu-initialization-period: 15m0s
+
 apiServer:
   extraArgs:
     # authorization-mode: "Node,RBAC"
@@ -73,7 +79,8 @@ apiServer:
     oidc-username-claim: email
     oidc-client-id: ${google_oauth_client_id}
     etcd-prefix: "${etcd_prefix}"
-    # cloud-provider: aws
+    cloud-provider: aws
+    anonymous-auth: false
 
   certSANs:
     - localhost
@@ -111,13 +118,6 @@ sync
 
 cat <<EOF
 ---
-controllerManagerExtraArgs:
-  # DEPRECATED: Would be removed in next version
-  cloud-provider: "aws"
-  configure-cloud-routes: "false"
-  horizontal-pod-autoscaler-use-rest-clients: "false"
-  horizontal-pod-autoscaler-downscale-delay: "15m0s"
-
 kubeletConfiguration:
   baseConfig:
     authentication:
