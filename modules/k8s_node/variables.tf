@@ -3,7 +3,7 @@ variable "name" {
 }
 
 variable "kube_version" {
-  default = "v1.11.2"
+  default = "v1.14.0-alpha3"
 }
 
 variable "node_labels" {
@@ -106,4 +106,9 @@ variable "root_volume_size" {
 variable "ebs_optimized" {
   description = "Enable EBS optimized for instances"
   default     = true
+}
+
+variable "source_dest_check" {
+  description = "Configure Source Destination check option of AWS instance"
+  default = true
 }

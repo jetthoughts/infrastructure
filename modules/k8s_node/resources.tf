@@ -69,8 +69,8 @@ resource "aws_launch_configuration" "node" {
   key_name             = "${var.ssh_key_name}"
   iam_instance_profile = "${aws_iam_instance_profile.nodes.id}"
   ebs_optimized        = "${var.ebs_optimized}"
-
-  enable_monitoring = false
+  enable_monitoring    = false
+  source_dest_check    = "${var.source_dest_check}"
 
   security_groups = ["${var.security_groups}"]
 
@@ -88,7 +88,7 @@ resource "aws_launch_configuration" "node" {
 
 # Run instances
 resource "aws_autoscaling_group" "node" {
-  name = "k8s-${var.name}-node"
+  name = "k8s_${var.name}_node"
 
   availability_zones = [
     "${var.availability_zone}",
