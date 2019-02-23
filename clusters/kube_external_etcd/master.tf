@@ -48,14 +48,10 @@ module "k8s_master" {
 
 data "template_file" "master_post_init" {
   template = <<EOF
-kubectl create clusterrolebinding cluster-admin-user --clusterrole=cluster-admin --user=${admin_email} || true
-kubectl create clusterrolebinding admin-user --clusterrole=admin --user=${admin_email} || true
+kubectl create clusterrolebinding cluster-admin-user --clusterrole=cluster-admin --user=${var.admin_email} || true
+kubectl create clusterrolebinding admin-user --clusterrole=admin --user=${var.admin_email} || true
 
 kubectl apply -f https://docs.projectcalico.org/v3.5/getting-started/kubernetes/installation/hosted/kubernetes-datastore/calico-networking/1.7/calico.yaml
 kubectl -n kube-system get po,no -o wide
   EOF
-
-  vars {
-    admin_email = "${var.admin_email}"
-  }
 }

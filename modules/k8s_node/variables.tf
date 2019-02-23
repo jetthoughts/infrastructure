@@ -107,8 +107,3 @@ variable "ebs_optimized" {
   description = "Enable EBS optimized for instances"
   default     = true
 }
-
-variable "source_dest_check" {
-  description = "Configure Source Destination check option of AWS instance"
-  default     = true
-}

@@ -70,7 +70,6 @@ resource "aws_launch_configuration" "node" {
   iam_instance_profile = "${aws_iam_instance_profile.nodes.id}"
   ebs_optimized        = "${var.ebs_optimized}"
   enable_monitoring    = false
-  source_dest_check    = "${var.source_dest_check}"
 
   security_groups = ["${var.security_groups}"]
 
