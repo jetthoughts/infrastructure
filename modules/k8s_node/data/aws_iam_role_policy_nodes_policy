@@ -8,7 +8,8 @@
         "ec2:AttachVolume",
         "ec2:DetachVolume",
         "ec2:CreateVolume",
-        "ec2:DeleteVolume"
+        "ec2:DeleteVolume",
+        "ec2:ModifyInstanceAttribute"
       ],
       "Resource": [
         "*"
