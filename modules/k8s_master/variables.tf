@@ -79,6 +79,7 @@ variable "bastion" {
     private_key = ""
   }
 }
+
 variable "admin_email" {
   description = "Admin email"
 }

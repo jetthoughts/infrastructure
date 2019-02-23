@@ -9,7 +9,7 @@ resource "null_resource" "generate_pki" {
 }
 
 data "local_file" "ca" {
-  filename = "${var.certs_path}/pki/ca.crt"
+  filename   = "${var.certs_path}/pki/ca.crt"
   depends_on = ["null_resource.generate_pki"]
 }
 
