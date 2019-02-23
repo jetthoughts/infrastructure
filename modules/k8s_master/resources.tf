@@ -24,17 +24,17 @@ resource "aws_instance" "masters" {
   instance_type           = "${var.instance_type}"
   key_name                = "${var.ssh_key_name}"
   iam_instance_profile    = "${aws_iam_instance_profile.masters.id}"
-  monitoring              = false
-  ebs_optimized           = true
+  monitoring              = "${var.monitoring}"
+  ebs_optimized           = "${var.ebs_optimized}"
   availability_zone       = "${var.availability_zone}"
   subnet_id               = "${var.subnet_id}"
   private_ip              = "${element(var.master_addresses, count.index)}"
-  disable_api_termination = false
-  source_dest_check       = false
+  disable_api_termination = "${var.disable_api_termination}"
+  source_dest_check       = "${var.source_dest_check}"
 
   root_block_device = {
-    volume_type           = "standard"
-    volume_size           = 8
+    volume_type           = "${var.root_volume_type}"
+    volume_size           = "${var.root_volume_size}"
     delete_on_termination = true
     iops                  = 0
   }

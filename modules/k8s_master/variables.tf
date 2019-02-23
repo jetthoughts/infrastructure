@@ -79,7 +79,6 @@ variable "bastion" {
     private_key = ""
   }
 }
-
 variable "admin_email" {
   description = "Admin email"
 }
@@ -144,4 +143,28 @@ variable "post_init_script" {
   default = <<EOF
 kubectl apply -f https://docs.projectcalico.org/v3.5/getting-started/kubernetes/installation/hosted/kubernetes-datastore/calico-networking/1.7/calico.yaml
   EOF
+}
+
+variable "source_dest_check" {
+  default = true
+}
+
+variable "disable_api_termination" {
+  default = true
+}
+
+variable "ebs_optimized" {
+  default = true
+}
+
+variable "monitoring" {
+  default = false
+}
+
+variable "root_volume_size" {
+  default = "8"
+}
+
+variable "root_volume_type" {
+  default = "standard"
 }
