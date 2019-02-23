@@ -110,5 +110,5 @@ variable "ebs_optimized" {
 
 variable "source_dest_check" {
   description = "Configure Source Destination check option of AWS instance"
-  default = true
+  default     = true
 }
