@@ -67,8 +67,8 @@ controlPlaneEndpoint: "${internal_domain}:6443"
 
 controllerManager:
   extraArgs:
-    cloud-provider: aws
-    horizontal-pod-autoscaler-cpu-initialization-period: 15m0s
+    cloud-provider: "aws"
+    horizontal-pod-autoscaler-cpu-initialization-period: "15m0s"
 
 apiServer:
   extraArgs:
@@ -79,8 +79,8 @@ apiServer:
     oidc-username-claim: email
     oidc-client-id: ${google_oauth_client_id}
     etcd-prefix: "${etcd_prefix}"
-    cloud-provider: aws
-    anonymous-auth: false
+    cloud-provider: "aws"
+    anonymous-auth: "false"
 
   certSANs:
     - localhost
