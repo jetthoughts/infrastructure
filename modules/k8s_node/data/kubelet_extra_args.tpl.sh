@@ -6,7 +6,7 @@ if [[ ! -z "${node_taints}" ]]; then
 fi
 
 LABELS_ARGS=
-if [[ ! -z "${node_taints}" ]]; then
+if [[ ! -z "${node_labels}" ]]; then
   LABELS_ARGS="--node-labels=${node_labels}"
 fi
 
