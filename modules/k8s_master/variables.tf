@@ -153,7 +153,7 @@ variable "disable_api_termination" {
 }
 
 variable "ebs_optimized" {
-  default = true
+  default = false
 }
 
 variable "monitoring" {
