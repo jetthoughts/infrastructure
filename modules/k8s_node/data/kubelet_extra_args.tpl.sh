@@ -11,5 +11,5 @@ if [[ ! -z "${node_taints}" ]]; then
 fi
 
 cat <<EOF | sudo tee /etc/sysconfig/kubelet
-KUBELET_EXTRA_ARGS=${kubelet_extra_args} --authentication-token-webhook $TAINT_ARGS $LABELS_ARGS
+KUBELET_EXTRA_ARGS=${kubelet_extra_args} $TAINT_ARGS $LABELS_ARGS
 EOF

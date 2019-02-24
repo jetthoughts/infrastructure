@@ -41,11 +41,11 @@ data "template_cloudinit_config" "node_init" {
     content      = "${data.template_file.kube_packages.rendered}"
   }
 
-  # part {
-  #   filename     = "08kubelet_extra_args.sh"
-  #   content_type = "text/x-shellscript"
-  #   content      = "${data.template_file.kubelet_extra_args.rendered}"
-  # }
+  part {
+    filename     = "08kubelet_extra_args.sh"
+    content_type = "text/x-shellscript"
+    content      = "${data.template_file.kubelet_extra_args.rendered}"
+  }
 
   part {
     filename     = "10node.sh"

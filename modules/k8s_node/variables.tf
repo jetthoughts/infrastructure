@@ -93,8 +93,6 @@ variable "kubelet_extra_args" {
 
   default = [
     "--cloud-provider=aws",
-    "--runtime-cgroups=/systemd/system.slice",
-    "--kubelet-cgroups=/systemd/system.slice",
   ]
 }
 
