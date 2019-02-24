@@ -80,7 +80,6 @@ apiServer:
     oidc-client-id: ${google_oauth_client_id}
     etcd-prefix: "${etcd_prefix}"
     cloud-provider: "aws"
-    anonymous-auth: "false"
 
   certSANs:
     - localhost
