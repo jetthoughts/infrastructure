@@ -45,9 +45,13 @@ resource "aws_instance" "masters" {
 
 resource "null_resource" "bootstrap_bastion" {
   depends_on = [
-    "aws_instance.masters",
     "aws_route53_record.internal",
+    "module.certificates",
   ]
+
+  triggers {
+    cluster_instance = "${aws_instance.masters.*.id[count.index]}"
+  }
 
   count = "${var.bastion["host"] == "" ? 0 : local.cluster_size}"
 
