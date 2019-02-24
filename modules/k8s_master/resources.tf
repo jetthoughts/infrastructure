@@ -1,5 +1,5 @@
 locals {
-  ec2_tags = "${merge(map("Name", format("k8s_%s_master", var.name), "KubernetesCluster", "${var.name}", "kubernetes.io/cluster/${var.name}", "true"), var.tags)}"
+  ec2_tags = "${merge(map("Name", format("k8s_%s_master", var.name), "KubernetesCluster", "${var.name}", "k8s.io/cluster/${var.name}", "true"), var.tags)}"
   pki_path = "${var.certs_path}/pki/"
 
   base_domain     = "${var.name}.${var.dns_primary_domain}"
