@@ -6,6 +6,7 @@ set -x
 set -e
 
 export PRIVATE_HOSTNAME=$(curl http://instance-data/latest/meta-data/hostname)
+export PUBLIC_IP=$(curl http://instance-data/latest/meta-data/public-ipv4)
 
 sysctl kernel.hostname=$PRIVATE_HOSTNAME
 
@@ -35,8 +36,9 @@ while [[ ! -f $KUBELET_PATH ]] && [[ $counter -ge 1 ]]; do
 done
 
 if [ "$NODE_LABELS" != "" ]; then
-  kubectl --kubeconfig=$KUBELET_PATH label node/$PRIVATE_HOSTNAME $NODE_LABELS
+  kubectl --kubeconfig=$KUBELET_PATH label node/$PRIVATE_HOSTNAME $NODE_LABELS || true
 fi
+kubectl --kubeconfig=$KUBELET_PATH label node/$PRIVATE_HOSTNAME "kubernetes.io/public-ipv4=$PUBLIC_IP" || true
 
 # If master_ip is the host kubeadm resolve it and use ip. It revert such changes
 kubectl --kubeconfig=/etc/kubernetes/kubelet.conf config set-cluster default-cluster --server="https://${master_ip}:6443"
