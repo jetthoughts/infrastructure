@@ -5,9 +5,11 @@ if [[ ! -z "${node_taints}" ]]; then
   TAINT_ARGS="--register-node=true --register-with-taints=${node_taints}"
 fi
 
-LABELS_ARGS=
+PUBLIC_IP=$(curl http://instance-data/latest/meta-data/public-ipv4)
+
+LABELS_ARGS="--node-labels=kubernetes.io/public-ipv4=$PUBLIC_IP"
 if [[ ! -z "${node_labels}" ]]; then
-  LABELS_ARGS="--node-labels=${node_labels}"
+  LABELS_ARGS="$LABELS_ARGS,${node_labels}"
 fi
 
 cat <<EOF | sudo tee /etc/sysconfig/kubelet
