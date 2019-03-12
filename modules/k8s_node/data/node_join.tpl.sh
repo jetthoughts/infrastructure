@@ -23,11 +23,9 @@ docker pull gcr.io/google_containers/kube-proxy-amd64:${kube_version} || true
 
 kubeadm join --token="${kube_token}" ${master_ip}:6443 --node-name="$PRIVATE_HOSTNAME" --discovery-token-unsafe-skip-ca-verification
 
-export NODE_LABELS="${node_labels}"
 export KUBELET_PATH="/etc/kubernetes/kubelet.conf"
 
-sleep 30
-
+sleep 2
 counter=30
 while [[ ! -f $KUBELET_PATH ]] && [[ $counter -ge 1 ]]; do
   sleep 5
@@ -35,9 +33,6 @@ while [[ ! -f $KUBELET_PATH ]] && [[ $counter -ge 1 ]]; do
   echo -n .
 done
 
-if [ "$NODE_LABELS" != "" ]; then
-  kubectl --kubeconfig=$KUBELET_PATH label node/$PRIVATE_HOSTNAME $NODE_LABELS || true
-fi
 kubectl --kubeconfig=$KUBELET_PATH label node/$PRIVATE_HOSTNAME "kubernetes.io/public-ipv4=$PUBLIC_IP" || true
 
 # If master_ip is the host kubeadm resolve it and use ip. It revert such changes
