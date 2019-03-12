@@ -26,6 +26,7 @@ kubeadm join --token="${bootstrap_token}" ${master_ip}:6443 --node-name="$PRIVAT
 export KUBELET_PATH="/etc/kubernetes/kubelet.conf"
 
 sleep 2
+
 counter=30
 while [[ ! -f $KUBELET_PATH ]] && [[ $counter -ge 1 ]]; do
   sleep 5
