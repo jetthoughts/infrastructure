@@ -62,7 +62,7 @@ data "template_cloudinit_config" "node_init" {
 
 resource "aws_launch_configuration" "node" {
   depends_on           = ["aws_iam_role_policy.nodes"]
-  name_prefix          = "k8s_${var.name}_node_"
+  name_prefix          = "kube_${var.name}_node_"
   image_id             = "${var.image_id}"
   user_data            = "${data.template_cloudinit_config.node_init.rendered}"
   instance_type        = "${var.instance_type}"
@@ -88,7 +88,7 @@ resource "aws_launch_configuration" "node" {
 
 # Run instances
 resource "aws_autoscaling_group" "node" {
-  name = "k8s_${var.name}_node"
+  name = "kube_${var.name}_node"
 
   availability_zones = [
     "${var.availability_zone}",
