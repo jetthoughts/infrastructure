@@ -7,7 +7,7 @@ fi
 
 PUBLIC_IP=$(curl http://instance-data/latest/meta-data/public-ipv4)
 
-LABELS_ARGS="--node-labels=kubernetes.io/public-ipv4=$PUBLIC_IP"
+LABELS_ARGS="--node-labels=node.kubernetes.io/public-ipv4=$PUBLIC_IP"
 if [[ ! -z "${node_labels}" ]]; then
   LABELS_ARGS="$LABELS_ARGS,${node_labels}"
 fi
