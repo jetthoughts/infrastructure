@@ -20,7 +20,7 @@ docker pull gcr.io/google_containers/kube-controller-manager-amd64:${k8s_version
 docker pull gcr.io/google_containers/kube-scheduler-amd64:${k8s_version} || true
 docker pull gcr.io/google_containers/kube-proxy-amd64:${k8s_version} || true
 
-kubeadm init --config /etc/kubernetes/kubeadm.yml
+kubeadm init --config /etc/kubernetes/kubeadm.yml --ignore-preflight-errors=SystemVerification
 
 # Allow other masters to join
 # https://github.com/cookeem/kubeadm-ha#kubeadm-init
