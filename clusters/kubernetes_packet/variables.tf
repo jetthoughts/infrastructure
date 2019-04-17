@@ -79,11 +79,11 @@ variable "kube_conf_remote_path" {
 
 // Nodes
 variable "node_labels" {
-  type = "list"
+  type    = "list"
   default = []
 }
 
 variable "pre_init_script" {
   description = "Content to be run before the kubeadm."
-  default = ""
+  default     = ""
 }

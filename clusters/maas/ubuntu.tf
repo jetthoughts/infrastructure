@@ -10,17 +10,19 @@
 # https://bugs.launchpad.net/ubuntu/+source/linux-firmware-raspi2/+bug/1691729
 resource "null_resource" "packages" {
   connection {
-    type = "ssh"
-    user = "ubuntu"
+    type        = "ssh"
+    user        = "ubuntu"
     private_key = "${file("~/.ssh/id_rsa")}"
-    host = "${var.server_ip}"
+    host        = "${var.server_ip}"
   }
 
   provisioner "remote-exec" {
     inline = [
       // "sudo apt-mark hold linux-raspi2 linux-image-raspi2 linux-headers-raspi2",
       "sudo dpkg-divert --divert /lib/firmware/brcm/brcmfmac43430-sdio-2.bin --package linux-firmware-raspi2 --rename --add /lib/firmware/brcm/brcmfmac43430-sdio.bin",
+
       "sudo apt-get update && sudo apt-get upgrade -y",
+
       // "sudo apt-mark unhold linux-raspi2 linux-image-raspi2 linux-headers-raspi2",
       // "sudo apt-get update && sudo apt-get upgrade -y && sudo apt-get dist-upgrade -y",
       // "sudo sed 's/device_tree_address.*/device_tree_address=0x02008000/g; s/^.*device_tree_end.*//g;' -i /boot/firmware/config.txt",
@@ -32,10 +34,10 @@ resource "null_resource" "packages" {
 # Ubuntu reference for hostnamectl: http://manpages.ubuntu.com/manpages/trusty/man1/hostnamectl.1.html
 resource "null_resource" "hostname" {
   connection {
-    type = "ssh"
-    user = "ubuntu"
+    type        = "ssh"
+    user        = "ubuntu"
     private_key = "${file("~/.ssh/id_rsa")}"
-    host = "${var.server_ip}"
+    host        = "${var.server_ip}"
   }
 
   provisioner "remote-exec" {
@@ -53,10 +55,10 @@ resource "null_resource" "wifi" {
   depends_on = ["null_resource.packages"]
 
   connection {
-    type = "ssh"
-    user = "ubuntu"
+    type        = "ssh"
+    user        = "ubuntu"
     private_key = "${file("~/.ssh/id_rsa")}"
-    host = "${var.server_ip}"
+    host        = "${var.server_ip}"
   }
 
   provisioner "remote-exec" {
@@ -80,9 +82,9 @@ resource "null_resource" "monitoring" {
   depends_on = ["null_resource.hostname", "null_resource.wifi"]
 
   connection {
-    type = "ssh"
-    user = "ubuntu"
-    host = "${var.server_ip}"
+    type        = "ssh"
+    user        = "ubuntu"
+    host        = "${var.server_ip}"
     private_key = "${file("~/.ssh/id_rsa")}"
   }
 
