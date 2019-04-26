@@ -12,7 +12,6 @@ resource "aws_instance" "masters" {
     "aws_iam_role_policy.masters",
     "module.certificates",
     "aws_route53_record.internal",
-    "aws_route53_record.api",
   ]
 
   ami           = "${var.image_id}"
