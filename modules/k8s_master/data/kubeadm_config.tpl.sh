@@ -64,6 +64,7 @@ apiServerCertSANs:
 - $PRIVATE_IP
 - $PRIVATE_HOSTNAME
 - ${domain}
+- ${internal_domain}
 EOF
 
 MASTER_IPS="${master_ips}"

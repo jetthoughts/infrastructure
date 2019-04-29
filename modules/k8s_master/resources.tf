@@ -146,6 +146,7 @@ data "template_file" "kubeadm_config" {
     kube_version           = "${var.kube_version}"
     k8s_pod_network_cidr   = "${var.k8s_pod_network_cidr}"
     domain                 = "${local.domain}"
+    internal_domain        = "${local.internal_domain}"
     google_oauth_client_id = "${var.google_oauth_client_id}"
     cluster_size           = "${var.cluster_size}"
     master_ips             = "\"${join("\" \"", concat(var.master_addresses, var.cert_sans))}\""
