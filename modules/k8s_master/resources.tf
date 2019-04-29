@@ -130,7 +130,7 @@ data "template_file" "master_user_data" {
     k8s_token              = "${var.k8s_token}"
     k8s_version            = "${var.kube_version}"
     k8s_pod_network_cidr   = "${var.k8s_pod_network_cidr}"
-    domain                 = "api.${var.name}.${var.datacenter}.${var.dns_primary_domain}"
+    domain                 = "${local.internal_domain}"
     google_oauth_client_id = "${var.google_oauth_client_id}"
     ca_crt                 = "${var.k8s_ca_crt}"
     master_ips             = "\"${join("\" \"", var.master_addresses)}\""
