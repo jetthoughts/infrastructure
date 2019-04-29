@@ -14,7 +14,7 @@ cat <<EOF > $KUBEADM_CONFIG
 apiVersion: kubeadm.k8s.io/v1alpha1
 kind: MasterConfiguration
 api:
-  controlPlaneEndpoint: ${domain}
+  controlPlaneEndpoint: ${internal_domain}
 kubernetesVersion: ${kube_version}
 nodeName: $PRIVATE_HOSTNAME
 token: ${k8s_token}
