@@ -4,8 +4,9 @@ resource "aws_route53_record" "api" {
   type    = "A"
   ttl     = "${var.dns_ttl}"
 
-  # records = ["${aws_instance.masters.*.public_ip}"]
-  records = "${var.master_addresses}"
+  records = ["${aws_instance.masters.*.public_ip}"]
+
+  # records = "${var.master_addresses}"
 }
 
 resource "aws_route53_record" "internal" {
