@@ -11,6 +11,14 @@ shift
 sans=$*
 
 docker run --rm -v $output/pki:/etc/kubernetes/pki miry/kubernetes:$version /bin/kubeadm alpha phase certs all --apiserver-cert-extra-sans "${sans}"
+
+readonly kubeadm="docker run --rm -v $output:/etc/kubernetes miry/kubernetes:$version /bin/kubeadm"
+
+$kubeadm alpha phase certs ca
+$kubeadm alpha phase certs etcd-ca
+$kubeadm alpha phase certs sa
+$kubeadm alpha phase certs front-proxy-ca
+
 docker run --rm -v $output:/etc/kubernetes miry/kubernetes:$version \
        /bin/kubeadm alpha phase kubeconfig admin
 docker run --rm -v $output:/etc/kubernetes miry/kubernetes:$version \
