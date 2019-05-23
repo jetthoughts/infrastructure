@@ -19,7 +19,11 @@ $kubeadm alpha phase certs etcd-ca
 $kubeadm alpha phase certs sa
 $kubeadm alpha phase certs front-proxy-ca
 
-docker run --rm -v $output:/etc/kubernetes miry/kubernetes:$version \
-       /bin/kubeadm alpha phase kubeconfig admin
+$kubeadm alpha phase kubeconfig admin
+
 docker run --rm -v $output:/etc/kubernetes miry/kubernetes:$version \
        sh -c '/bin/kubeadm alpha phase kubeconfig user --client-name="user" 2>/dev/null' > $output/user.conf
+
+
+docker run --rm -v $(pwd)/assets/v111:/etc/kubernetes miry/kubernetes:$version \
+       sh -c '/bin/kubeadm alpha phase kubeconfig user --client-name="user" 2>/dev/null' > $(pwd)/assets/v111/user.conf
