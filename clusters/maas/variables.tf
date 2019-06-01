@@ -31,3 +31,8 @@ variable "maas_admin" {
     "password" = "changeme"
   }
 }
+
+variable "monitoring_disabled" {
+  description = "Allow setup netdata on instance"
+  default = false
+}

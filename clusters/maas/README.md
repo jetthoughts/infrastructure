@@ -28,12 +28,7 @@
 
 1. Upgrade packages and setup WiFi step by step:
     ```shell
-    $ terraform apply -target=null_resource.packages   -auto-approve -var 'server_ip=10.0.0.1'
-    $ terraform apply -target=null_resource.hostname   -auto-approve -var 'server_ip=10.0.0.1' -var 'server_hostname=maas'
-    $ terraform apply -target=null_resource.wifi       -auto-approve -var 'server_ip=10.0.0.1' -var 'wlan_ssid=FreeWiFi'   -var 'wlan_psk=ChangeMe'
-    $ terraform apply -target=null_resource.zram       -auto-approve -var 'server_ip=10.0.0.1'
-    $ : Optional you can install netdata monitoring tool
-    $ terraform apply -target=null_resource.monitoring -auto-approve -var 'server_ip=10.0.0.1'
+    $ terraform apply -target=null_resource.networking -auto-approve -var 'server_ip=192.168.178.110' -var 'wlan_ssid=FreeWiFi' -var 'wlan_psk=ChangeMe'
     ```
 1. Detect a new IP that attached to WiFi and replace it in `terraform.tfvars` for `server_ip` variable
 
