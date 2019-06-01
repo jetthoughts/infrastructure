@@ -2,7 +2,7 @@
 # Maas Devel: https://docs.ubuntu.com/maas/devel/en/release-notes
 # https://docs.maas.io/devel/en/installconfig-package-install
 resource "null_resource" "maas-packages" {
-  depends_on = ["null_resource.wifi", "null_resource.zram", "null_resource.maas-eth-network"]
+  depends_on = ["null_resource.maas-eth-network"]
 
   connection {
     type        = "ssh"
