@@ -13,7 +13,10 @@ resource "null_resource" "maas-packages" {
 
   provisioner "remote-exec" {
     inline = [
-      "sudo add-apt-repository -yu ppa:maas/next",
+      # 04E7FDC5684D4A1C - public key "Launchpad PPA for MAAS"
+      "sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 04E7FDC5684D4A1C",
+      "sudo apt-get -y update",
+      "sudo apt-add-repository -yu ppa:maas/next",
       "sudo apt-get update && sudo apt-get upgrade -y",
       "DEBIAN_FRONTEND=noninteractive sudo apt install -yq --no-install-recommends maas bzr isc-dhcp-server wakeonlan amtterm wsmancli zram-config maas-region-controller maas-rack-controller tcpdump",
       "sudo shutdown -r +1",

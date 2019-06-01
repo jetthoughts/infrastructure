@@ -2,9 +2,11 @@
 # Doc: https://www.terraform.io/intro/getting-started/variables.html
 
 variable "server_ip" {}
+
 variable "server_hostname" {
   default = "maas"
 }
+
 variable "private_key_path" {
   default = "~/.ssh/id_rsa"
 }
