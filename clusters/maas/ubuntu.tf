@@ -31,6 +31,8 @@ resource "null_resource" "packages" {
 
 # Ubuntu reference for hostnamectl: http://manpages.ubuntu.com/manpages/trusty/man1/hostnamectl.1.html
 resource "null_resource" "hostname" {
+  depends_on = ["null_resource.packages"]
+
   connection {
     type        = "ssh"
     user        = "ubuntu"
@@ -50,7 +52,7 @@ resource "null_resource" "hostname" {
 # https://www.raspberrypi.org/forums/viewtopic.php?f=28&t=141834
 # https://medium.com/a-swift-misadventure/how-to-setup-your-raspberry-pi-2-3-with-ubuntu-16-04-without-cables-headlessly-9e3eaad32c01
 resource "null_resource" "wifi" {
-  depends_on = ["null_resource.packages"]
+  depends_on = ["null_resource.hostname"]
 
   connection {
     type        = "ssh"
@@ -63,10 +65,10 @@ resource "null_resource" "wifi" {
     inline = [
       "sudo apt-get install -yq wireless-tools wpasupplicant",
       "cd /lib/firmware/brcm/",
-      # "sudo dpkg-divert --divert /lib/firmware/brcm/brcmfmac43430-sdio-2.bin --package linux-firmware-raspi2 --rename --add /lib/firmware/brcm/brcmfmac43430-sdio.bin",
-      # "sudo mv brcmfmac43430-sdio.bin brcmfmac43430-sdio.bin.old",
-      # "sudo wget https://github.com/RPi-Distro/firmware-nonfree/raw/master/brcm/brcmfmac43430-sdio.bin",
-      # "sudo wget https://github.com/RPi-Distro/firmware-nonfree/raw/master/brcm/brcmfmac43430-sdio.txt",
+      "sudo dpkg-divert --divert /lib/firmware/brcm/brcmfmac43430-sdio-2.bin --package linux-firmware-raspi2 --rename --add /lib/firmware/brcm/brcmfmac43430-sdio.bin",
+      "sudo mv brcmfmac43430-sdio.bin brcmfmac43430-sdio.bin.old",
+      "sudo wget https://github.com/RPi-Distro/firmware-nonfree/raw/master/brcm/brcmfmac43430-sdio.bin",
+      "sudo wget https://github.com/RPi-Distro/firmware-nonfree/raw/master/brcm/brcmfmac43430-sdio.txt",
       "mkdir -p /etc/network/interfaces.d",
       "echo \"allow-hotplug wlan0\niface wlan0 inet dhcp\nwpa-conf /etc/wpa_supplicant/wpa_supplicant.conf\" | sudo tee /etc/network/interfaces.d/10-wlan.cfg",
       "echo \"network={\\nssid=\\\"${var.wlan_ssid}\\\"\\npsk=\\\"${var.wlan_psk}\\\"\\n}\" | sudo tee /etc/wpa_supplicant/wpa_supplicant.conf",
@@ -78,6 +80,8 @@ resource "null_resource" "wifi" {
 }
 
 resource "null_resource" "zram" {
+  depends_on = ["null_resource.wifi"]
+
   connection {
     type        = "ssh"
     user        = "ubuntu"
@@ -102,7 +106,7 @@ resource "null_resource" "zram" {
 # Monitoring netdata
 # https://my-netdata.io/
 resource "null_resource" "monitoring" {
-  depends_on = ["null_resource.hostname"]
+  depends_on = ["null_resource.wifi"]
 
   connection {
     type        = "ssh"
