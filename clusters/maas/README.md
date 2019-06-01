@@ -2,7 +2,7 @@
 
 ## Setup Ubuntu
 
-1. Download and burn image Ubuntu Classic Server from https://ubuntu-pi-flavour-maker.org/download/
+1. Download and burn image Ubuntu Classic Server from https://www.ubuntu.com/download/iot/raspberry-pi-2-3
 2. Upgrade packages and setup WiFi step by step:
 
 ```shell
