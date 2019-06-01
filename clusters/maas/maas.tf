@@ -1,25 +1,3 @@
-resource "null_resource" "zram" {
-  connection {
-    type = "ssh"
-    user = "ubuntu"
-    host = "${var.server_ip}"
-    private_key = "${file("~/.ssh/id_rsa")}"
-  }
-
-  provisioner "file" {
-    source      = "data/zram"
-    destination = "/tmp/zram"
-  }
-
-  provisioner "remote-exec" {
-    inline = [
-      "cat /tmp/zram | sudo tee /etc/rc.local",
-      "sudo bash /tmp/zram",
-      "sudo shutdown -r +1",
-    ]
-  }
-}
-
 # https://github.com/madeden/blogposts/blob/master/k8s-gpu-cluster/10-install-maas.md
 # Maas Devel: https://docs.ubuntu.com/maas/devel/en/release-notes
 # https://docs.maas.io/devel/en/installconfig-package-install
@@ -27,10 +5,10 @@ resource "null_resource" "maas-packages" {
   depends_on = ["null_resource.wifi", "null_resource.zram", "null_resource.maas-eth-network"]
 
   connection {
-    type = "ssh"
-    user = "ubuntu"
-    host = "${var.server_ip}"
-    private_key = "${file("~/.ssh/id_rsa")}"
+    type        = "ssh"
+    user        = "ubuntu"
+    host        = "${var.server_ip}"
+    private_key = "${file(var.private_key_path)}"
   }
 
   provisioner "remote-exec" {
@@ -46,10 +24,10 @@ resource "null_resource" "maas-packages" {
 resource "null_resource" "maas-eth-network" {
   depends_on = ["null_resource.wifi"]
   connection {
-    type = "ssh"
-    user = "ubuntu"
-    host = "${var.server_ip}"
-    private_key = "${file("~/.ssh/id_rsa")}"
+    type        = "ssh"
+    user        = "ubuntu"
+    host        = "${var.server_ip}"
+    private_key = "${file(var.private_key_path)}"
   }
 
   provisioner "remote-exec" {
@@ -76,10 +54,10 @@ resource "null_resource" "maas-admin" {
   depends_on = ["null_resource.maas-packages"]
 
   connection {
-    type = "ssh"
-    user = "ubuntu"
-    host = "${var.server_ip}"
-    private_key = "${file("~/.ssh/id_rsa")}"
+    type        = "ssh"
+    user        = "ubuntu"
+    host        = "${var.server_ip}"
+    private_key = "${file(var.private_key_path)}"
   }
 
   provisioner "remote-exec" {

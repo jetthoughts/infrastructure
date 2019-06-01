@@ -2,9 +2,13 @@
 # Doc: https://www.terraform.io/intro/getting-started/variables.html
 
 variable "server_ip" {}
-variable "server_ip_eth" {}
-variable "server_ip_wlan" {}
-variable "server_hostname" {}
+variable "server_hostname" {
+  default = "maas"
+}
+variable "private_key_path" {
+  default = "~/.ssh/id_rsa"
+}
+
 variable "wlan_ssid" {}
 variable "wlan_psk" {}
 
