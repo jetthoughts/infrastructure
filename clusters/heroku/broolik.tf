@@ -25,3 +25,9 @@ resource "heroku_domain" "broolik-ml" {
   app      = heroku_app.broolik-master.name
   hostname = "broolik.ml"
 }
+
+resource "heroku_pipeline_coupling" "broolik-development" {
+  app      = heroku_app.broolik-master.name
+  pipeline = heroku_pipeline.broolik.id
+  stage    = "development"
+}
