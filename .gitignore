@@ -7,3 +7,6 @@
 .terraform/
 env.sh
 terraform.tfvars
+
+# Keys
+*.key
