@@ -20,3 +20,8 @@ resource "heroku_app" "broolik-master" {
   region           = "us"
   stack            = "heroku-18"
 }
+
+resource "heroku_domain" "broolik-ml" {
+  app      = heroku_app.broolik-master.name
+  hostname = "broolik.ml"
+}
